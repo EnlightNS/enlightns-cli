@@ -8,7 +8,20 @@ class Device(object):
 
     @classmethod
     def interfaces(self):
-        """Returs the network interfaces of the device or computer."""
+        """Returns the network interfaces of the device or computer.
+
+        :returns: the available network interfaces """
         local_interfaces = netifaces.interfaces()
-        local_interfaces.remove('lo')
         return local_interfaces
+
+    def get_ip(self, interface):
+        """Returns the ip address of the selected network interface.
+
+        :returns: the ip address """
+        try:
+            lan_ip = netifaces.ifaddresses(interface)[netifaces.AF_INET].pop()[
+                'addr'].strip()
+        except Exception, e:
+            lan_ip = ''
+
+        return lan_ip
