@@ -2,6 +2,8 @@
 from __future__ import unicode_literals, absolute_import
 
 from ConfigParser import ConfigParser
+import os
+import click
 
 from enscli.settings import (ENLIGHTNS_CONFIG_FULLPATH,
                              ENLIGHTNS_CONFIG_SECTION, )
@@ -98,4 +100,12 @@ class EnlightnsConfig(object):
             config.write(file)
 
         return option, value
+
+    def delete(self):
+        """Deletes the configuration file"""
+        try:
+            os.remove(ENLIGHTNS_CONFIG_FULLPATH)
+        except Exception, e:
+            msg = 'Unable to delete the configuration file, error: {0}'
+            click.echo(click.style(msg.format(e), fg='red'))
 

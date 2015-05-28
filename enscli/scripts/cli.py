@@ -5,6 +5,7 @@ import click
 import netifaces
 
 from enscli.rest.services import EnlightnsApi
+from enscli.tools.configurations import EnlightnsConfig
 from enscli.tools.interfaces import Device
 
 
@@ -14,6 +15,7 @@ style = click.style
 # CLI settings
 api = EnlightnsApi()
 device = Device()
+config = EnlightnsConfig()
 ip, interface = netifaces.gateways()['default'][netifaces.AF_INET]
 if_msg = """Set which network interface to retrieve the ip from
     Default interface: {0}
@@ -32,8 +34,13 @@ def cli():
 @click.option('-p', '--password', prompt=True, hide_input=True)
 def authenticate(username, password):
     """Authenticate your account on EnlightNS.com"""
-    click.echo(username)
-    click.echo(password)
+    token = api.authenticate(username=username, password=password)
+
+    if token:
+        config.write('token', token)
+        click.echo('Successfully authenticated')
+    else:
+        click.echo('Unable to authenticate your account, please try again.')
 
     return
 
@@ -74,12 +81,18 @@ def lan(interface):
 
 
 @cli.command()
-@click.option('-l', '--list', default=False, flag_value=True,
+@click.option('-l', '--list-records', default=False, flag_value=True,
               help='List your records')
-def records():
+def records(list_records):
     """Manage your DNS record(s)"""
     # try to connect to the API first if unable to connect you MUST first
     # authenticate
+    if config.token and list_records:
+        result = api.list_records()
+        if result:
+            click.echo('Your DNS Records:')
+            for record in result:
+                click.echo('\t' + record['name'])
 
     return
 

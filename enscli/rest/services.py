@@ -12,17 +12,35 @@ class EnlightnsApi(object):
     API."""
     url = ENLIGHTNS_API_URL
     config = EnlightnsConfig()
+    if config.token:
+        token = config.token
+    else:
+        token = ''
+    auth_header = {'Authorization': 'JWT ' + config.token, }
 
     @classmethod
-    def authenticate(self):
+    def authenticate(self, username, password):
         """Authenticate the user against EnlightNS.com
+
+        :param username: your enlightns.com username
+        :param password: your enlightns.com password
 
         :returns: set the token in the configuration file"""
         url = self.url + '/api-token-auth/'
+        headers = {'Content-type': 'application/json'}
 
-        result = requests.post
+        data = {
+            'username': username,
+            'password': password,
+        }
 
-        return
+        result = requests.post(url, data=json.dumps(data), headers=headers)
+        result = result.json() if result.ok else ''
+
+        if 'token' in result:
+            self.token = result['token']
+
+        return self.token
 
     @classmethod
     def ip(self):
@@ -31,16 +49,23 @@ class EnlightnsApi(object):
         :return: your public IP address.
         """
         url = self.url + '/tools/whatismyip/'
-        result = requests.get(url)
 
-        return json.loads(result.content)
+        result = requests.get(url)
+        result = result.json() if result.ok else ''
+
+        return result
 
     def list_records(self):
         """List the DNS records of the user.
 
+        We MUST filter by record type A and AAAA otherwise the CNAME records
+        cannot be updated with an IP address.
+
         :returns: the list of DNS records"""
-        url = self.url + '/'
+        url = self.url + '/user/record/?type=A,AAAA'
+        headers = self.auth_header
 
-        return
+        result = requests.get(url, headers=headers)
+        result = result.json() if result.ok else ''
 
-
+        return result
