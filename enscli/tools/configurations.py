@@ -68,7 +68,7 @@ class EnlightnsConfig(object):
         if 'known_ip' in self.config:
             self.known_ip = self.config['known_ip']
 
-        if 'debug' in self.debug:
+        if 'debug' in self.config:
             self.debug = self.config['debug']
 
     def read(self):

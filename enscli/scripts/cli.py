@@ -97,18 +97,19 @@ def lan(interface):
               help='List all records available in EnlightNS.com')
 @click.option('-a', '--all', default=False, flag_value=True,
               help='List all records including the locally set')
-def records(list_records, all):
+@click.option('-t', '--text', default=False, flag_value=True,
+              help='Returns the DNS record in a text format.')
+def records(list_records, all, text):
     """Manage your DNS record(s)"""
 
     # Default: show the record that is set in the config file
-    if config.records and not list_records or all:
+    if config.records and not list_records and not text or all:
         click.echo(style('Currently configured record(s) to update:\n', fg='cyan'))
         records_list = config.records.split(',')
         records_list.remove('')
         for record in records_list:
-            click.echo('\t' + record.split('-')[1])
-
-    if all:
+            pk, record = record.split('}')
+            click.echo('\t' + record)
         click.echo('')
 
     # list the records from the API
@@ -123,6 +124,13 @@ def records(list_records, all):
                                         record['content'].ljust(15, str(' ')),
                                         record['type']))
             click.echo('')
+
+    if text and not all and not list_records:
+        records_list = config.records.split(',')
+        records_list.remove('')
+        for record in records_list:
+            pk, record = record.split('}')
+            click.echo(record)
 
     if not config.records and not list_records:
         click.echo('Please set a record to update')
@@ -160,7 +168,7 @@ def set(records, ipv6, which_ip, interface, debug):
             # Write the records to the configuration file
             record_config = ""
             for record in records_list:
-                record_config += str(record['id']) + '-' + record['name'] + ','
+                record_config += '{' + str(record['id']) + '}' + record['name'] + ','
             config.write('records', record_config)
             click.echo(REC_WRITE_SUCCESS)
 
@@ -186,8 +194,38 @@ def set(records, ipv6, which_ip, interface, debug):
 @cli.command()
 def update():
     """Update your DNS record(s)"""
-    if config.records and config.token:
-        pass
+
+    # update only if a record is set to update and that the client is
+    # authenticated
+    if config.records and config.token and config.interface and config.which_ip:
+        # define which ip to update the record(s) with
+        if config.which_ip == 'wan':
+            ip = api.ip()
+            if 'ip' in ip:
+                ip = ip['ip']
+        else:
+            ip = device.get_ip(config.interface)
+
+        if not config.known_ip or ip != config.known_ip:
+            # update the record
+            records = config.records.split(',')
+            records.remove('')
+            results = []
+            click.echo('Updating the record(s) ...')
+            with click.progressbar(records) as update_records:
+                for record in update_records:
+                    pk, record = record.split('}')
+                    pk = pk[1:]
+                    result = api.update(pk, ip)
+                    if result:
+                        results.append(result)
+
+            for r in results:
+                click.echo(r['name'] + '\t' + r['content'])
+        else:
+            click.echo('No update needed')
+
+        config.write('known_ip', ip)
 
     return
 

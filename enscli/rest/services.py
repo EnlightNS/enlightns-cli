@@ -17,7 +17,7 @@ class EnlightnsApi(object):
     else:
         token = ''
     device = Device()
-    if config.debug:
+    if config.debug == "on":
         url = ENLIGHTNS_API_DEBUG_URL
     else:
         url = ENLIGHTNS_API_URL
@@ -85,38 +85,26 @@ class EnlightnsApi(object):
         result = requests.get(url, headers=headers)
         result = result.json() if result.ok else ''
 
-        record = result[0]
-        is_owner = True if result and 'name' in result[0] else False
+        try:
+            record = result[0]
+            is_owner = True if result and 'name' in result[0] else False
+        except Exception, e:
+            record = None
+            is_owner = False
 
         return is_owner, record
 
-    def update(self):
+    def update(self, pk, ip):
         """Update the DNS records against the EnlightNS API
 
         :returns: True if it successfully update the record(s)"""
 
-        url = self.url + '/user/record/{id}/'
+        url = self.url + '/user/record/{pk}/'.format(pk=pk)
         headers = self.auth_header
 
-        # define which ip to update the record(s) with
-        if self.config.which_ip == 'wan':
-            ip = self.ip()
-        else:
-            ip = self.device.get_ip(self.config.interface)
+        result = requests.put(url, data={'content': ip, },
+                               headers=headers)
 
-        # update the record
-        records = self.config.records.split(',')
-        records.remove('')
-        for record in records:
-            id, record = record.split('-')
-            result = requests.post(url.format(id=id), data={'content': ip, },
-                                   headers=headers)
-            result = result.json() if result.ok else False
-
-
-        # writes the ip to the config file instead of calling the api if it
-        # stays the same ip address
-
-        return
+        return result.json() if result.ok else False
 
 
