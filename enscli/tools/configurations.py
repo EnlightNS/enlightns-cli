@@ -71,7 +71,8 @@ class EnlightnsConfig(object):
         if 'debug' in self.config:
             self.debug = self.config['debug']
 
-    def read(self):
+    @staticmethod
+    def read():
         '''This function load all the configurations from the file located in
         .enlightns/enlightns.conf and return all the information.
 
@@ -95,7 +96,8 @@ class EnlightnsConfig(object):
 
         return configs
 
-    def write(self, option, value):
+    @staticmethod
+    def write(option, value):
         """Sets the option=value in the configuration file
 
         :param option: the name of the option
@@ -116,7 +118,8 @@ class EnlightnsConfig(object):
 
         return option, value
 
-    def delete(self):
+    @staticmethod
+    def delete():
         """Deletes the configuration file"""
         try:
             os.remove(ENLIGHTNS_CONFIG_FULLPATH)
