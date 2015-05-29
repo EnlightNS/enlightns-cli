@@ -106,7 +106,11 @@ def records(list_records, all, text):
     if config.records and not list_records and not text or all:
         click.echo(style('Currently configured record(s) to update:\n', fg='cyan'))
         records_list = config.records.split(',')
-        records_list.remove('')
+        if len(records_list) > 1:
+            try:
+                records_list.remove('')
+            except Exception, e:
+                pass
         for record in records_list:
             pk, record = record.split('}')
             click.echo('\t' + record)
