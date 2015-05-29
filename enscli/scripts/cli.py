@@ -10,7 +10,7 @@ from enscli.tools.interfaces import Device
 from enscli.tools.messages import (IF_MSG, SET_REC_MSG, REC_LIST_MSG, REC_FAIL,
                                    REC_WRITE_SUCCESS, SET_IPV6_HELP,
                                    SET_WHICH_IP_HELP, SET_INET_HELP,
-                                   SET_DEBUG_HELP)
+                                   SET_DEBUG_HELP, NOTHING_HAPPENED_MSG)
 
 
 # Click utilities
@@ -88,6 +88,15 @@ def lan(interface):
         click.echo(ip)
     else:
         click.echo('Unable to retrieve you local ip address')
+
+    return
+
+
+@cli.command()
+def logout():
+    """Logout your account from the agent."""
+    config.write('token', '')
+    click.echo('You successfully logged out.')
 
     return
 
@@ -227,6 +236,8 @@ def update():
             click.echo('No update needed')
 
         config.write('known_ip', ip)
+    else:
+        click.echo(NOTHING_HAPPENED_MSG)
 
     return
 
