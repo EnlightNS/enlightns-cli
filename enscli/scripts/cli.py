@@ -103,14 +103,10 @@ def records(list_records, all, text):
     """Manage your DNS record(s)"""
 
     # Default: show the record that is set in the config file
-    if config.records and not list_records and not text or all:
+    if config.records and (not list_records and not text or all):
         click.echo(style('Currently configured record(s) to update:\n', fg='cyan'))
         records_list = config.records.split(',')
-        if len(records_list) > 1:
-            try:
-                records_list.remove('')
-            except Exception, e:
-                pass
+        records_list.remove('')
         for record in records_list:
             pk, record = record.split('}')
             click.echo('\t' + record)
@@ -235,14 +231,14 @@ def update():
 
 
 @cli.command()
-@click.option('-t', '--text', default=False, flag_value=True,
-              help='Returns the IP in a text format.')
-def wan(text):
+@click.option('-j', '--json', default=False, flag_value=True,
+              help='Returns the IP in a JSON format.')
+def wan(json):
     """Returns your public IP"""
 
     my_ip = api.ip()
 
-    if text and 'ip' in my_ip:
+    if not(json and 'ip' in my_ip):
         my_ip = my_ip['ip']
 
     click.echo(my_ip)
