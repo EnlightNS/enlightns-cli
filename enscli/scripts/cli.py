@@ -223,6 +223,7 @@ def update():
             for r in results:
                 click.echo(r['name'] + '\t' + r['content'])
         else:
+            # TODO: implement a resolver
             click.echo('No update needed')
 
         config.write('known_ip', ip)
