@@ -20,25 +20,31 @@ class EnlightnsConfig(object):
 
         [enlightns]
         # enlightns api token
-        token=t8otffvsmhjloexa9so3e1vp2lixh1ihghtt3hhezaflee54dstgow0luyhetc33oi9hfoqbpsp6rsxjam3ns4yfdfh06rujutxo1yktytymni3hnsg5elmv29dxo04emhxz0whhdswj3bfckaikdrwvolb5aqir0rcvapwkng3ult6fej3xfmh56vn4tld0v0ir34hjrj6q7e4mwud41qfx04ohpcqhmtmr
+        token = t8otffvsmhjloexa9so3e1vp2lixh1ihghtt3hhezaflee54dstgow0luyh...
 
         # a single record or a list of records
         # test.enlightns.com
         # or
         # test.enlightns.com,test2.enlightns.com
-        records=test.enlightns.com
+        records = test.enlightns.com
 
         # interface possible values [en0, eth0, wlan0, etc]
-        interface=eth0
+        interface = eth0
 
-        # which_ip possible values [wan, lan]
-        which_ip=lan
+        # which_ip possible values (wan|lan)
+        which_ip = lan
+
+        #set if we update using IPv6 (on|off)
+        ipv6 = on
     """
     config = {}
     token = ''
     records = []
     interface = ''
     which_ip = ''
+    ipv6 = ''
+    known_ip = ''
+    debug = ''
 
     def __init__(self):
         # Read the configuration file
@@ -55,6 +61,15 @@ class EnlightnsConfig(object):
 
         if 'which_ip' in self.config:
             self.which_ip = self.config['which_ip']
+
+        if 'ipv6' in self.config:
+            self.ipv6 = self.config['ipv6']
+
+        if 'known_ip' in self.config:
+            self.known_ip = self.config['known_ip']
+
+        if 'debug' in self.debug:
+            self.debug = self.config['debug']
 
     def read(self):
         '''This function load all the configurations from the file located in
