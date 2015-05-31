@@ -10,7 +10,8 @@ from enscli.tools.interfaces import Device
 from enscli.tools.messages import (IF_MSG, SET_REC_MSG, REC_LIST_MSG, REC_FAIL,
                                    REC_WRITE_SUCCESS, SET_IPV6_HELP,
                                    SET_WHICH_IP_HELP, SET_INET_HELP,
-                                   SET_DEBUG_HELP, NOTHING_HAPPENED_MSG)
+                                   SET_DEBUG_HELP, NOTHING_HAPPENED_MSG,
+                                   NO_UPDATE)
 
 
 # Click utilities
@@ -239,7 +240,8 @@ def update(force, silent):
             else:
                 for pk, record in config.records_with_pk():
                     api.update(pk, ip)
-
+        else:
+            click.echo(NO_UPDATE) if not silent else None
         config.write('known_ip', ip)
     else:
         click.echo(NOTHING_HAPPENED_MSG)
