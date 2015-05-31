@@ -10,17 +10,20 @@ from enscli.tools.interfaces import Device
 from enscli.tools.messages import (IF_MSG, SET_REC_MSG, REC_LIST_MSG, REC_FAIL,
                                    REC_WRITE_SUCCESS, SET_IPV6_HELP,
                                    SET_WHICH_IP_HELP, SET_INET_HELP,
-                                   SET_DEBUG_HELP)
+                                   SET_DEBUG_HELP, NOTHING_HAPPENED_MSG,
+                                   NO_UPDATE)
 
 
 # Click utilities
+from enscli.tools.resolver import resolve_a_record
+
 style = click.style
 
 # CLI settings
 api = EnlightnsApi()
 device = Device()
 config = EnlightnsConfig()
-ip, interface = netifaces.gateways()['default'][netifaces.AF_INET]
+local_ip, interface = netifaces.gateways()['default'][netifaces.AF_INET]
 if config and config.interface:
     interface = config.interface
 
@@ -49,96 +52,6 @@ def authenticate(username, password):
 
 
 @cli.command()
-def cron():
-    """Configure the EnlightNS agent to run through
-    a cron"""
-
-    return
-
-
-@cli.command()
-def interfaces():
-    """Displays the available network interfaces on the device."""
-
-    local_interface = device.interfaces()
-    click.echo(style('Available interface(s):\n', fg='yellow'))
-
-    for inet, ip in local_interface.items():
-        msg = '\t' + inet.ljust(10, str(' '))
-        if ip and 'ipv4' in ip:
-            ipv4 = str(ip['ipv4'])
-            msg += 'IPv4: ' + ipv4.ljust(16, str(' '))
-        if ip and 'ipv6' in ip:
-            msg += 'IPv6: ' + ip['ipv6']
-        click.echo(msg)
-    click.echo('')
-
-    return
-
-
-@cli.command()
-@click.option('-i', '--interface', default=interface,
-              type=click.Choice(device.interfaces_only()),
-              help=IF_MSG.format(interface))
-def lan(interface):
-    """Returns the LAN IP of the selected device"""
-
-    ip = device.get_ip(interface=interface)
-    if ip:
-        click.echo(ip)
-    else:
-        click.echo('Unable to retrieve you local ip address')
-
-    return
-
-
-@cli.command()
-@click.option('-l', '--list-records', default=False, flag_value=True,
-              help='List all records available in EnlightNS.com')
-@click.option('-a', '--all', default=False, flag_value=True,
-              help='List all records including the locally set')
-@click.option('-t', '--text', default=False, flag_value=True,
-              help='Returns the DNS record in a text format.')
-def records(list_records, all, text):
-    """Manage your DNS record(s)"""
-
-    # Default: show the record that is set in the config file
-    if config.records and not list_records and not text or all:
-        click.echo(style('Currently configured record(s) to update:\n', fg='cyan'))
-        records_list = config.records.split(',')
-        records_list.remove('')
-        for record in records_list:
-            pk, record = record.split('}')
-            click.echo('\t' + record)
-        click.echo('')
-
-    # list the records from the API
-    if config.token and list_records or all:
-        result = api.list_records()
-        if result:
-            click.echo(style('Your DNS Records:\n', fg='yellow'))
-            for record in result:
-                click.echo(
-                    REC_LIST_MSG.format(record['name'],
-                                        str(record['ttl']).ljust(6, str(' ')),
-                                        record['content'].ljust(15, str(' ')),
-                                        record['type']))
-            click.echo('')
-
-    if text and not all and not list_records:
-        records_list = config.records.split(',')
-        records_list.remove('')
-        for record in records_list:
-            pk, record = record.split('}')
-            click.echo(record)
-
-    if not config.records and not list_records:
-        click.echo('Please set a record to update')
-
-    return
-
-
-@cli.command()
 @click.option('-r', '--records', help=SET_REC_MSG)
 @click.option('-6', '--ipv6', default='off', type=click.Choice(['on', 'off']),
               help=SET_IPV6_HELP)
@@ -148,7 +61,7 @@ def records(list_records, all, text):
               type=click.Choice(device.interfaces_only()), help=SET_INET_HELP)
 @click.option('-d', '--debug', default='off', type=click.Choice(['on', 'off']),
               help=SET_DEBUG_HELP)
-def set(records, ipv6, which_ip, interface, debug):
+def configure(records, ipv6, which_ip, interface, debug):
     """Configure the EnlightNS agent"""
 
     # validates ownership of the record(s)
@@ -192,11 +105,107 @@ def set(records, ipv6, which_ip, interface, debug):
 
 
 @cli.command()
-def update():
+def cron():
+    """Configure the EnlightNS agent to run through
+    a cron"""
+
+    return
+
+
+@cli.command()
+@click.option('-l', '--list-records', default=False, flag_value=True,
+              help='List all records available in EnlightNS.com')
+@click.option('-a', '--all', default=False, flag_value=True,
+              help='List all records including the locally set')
+@click.option('-t', '--text', default=False, flag_value=True,
+              help='Returns the DNS record in a text format.')
+def hosts(list_records, all, text):
+    """Manage your DNS record(s)"""
+
+    # Default: show the record that is set in the config file
+    if config.records and (not list_records and not text or all):
+        click.echo(style('Currently configured record(s) to update:\n', fg='cyan'))
+        for record in config.records_to_str():
+            click.echo('\t' + record)
+        click.echo('')
+
+    # list the records from the API
+    if config.token and list_records or all:
+        result = api.list_records()
+        if result:
+            click.echo(style('Your DNS Records:\n', fg='yellow'))
+            for record in result:
+                click.echo(
+                    REC_LIST_MSG.format(record['name'],
+                                        str(record['ttl']).ljust(6, str(' ')),
+                                        record['content'].ljust(15, str(' ')),
+                                        record['type']))
+            click.echo('')
+
+    if text and not all and not list_records:
+        for record in config.records_to_str():
+            click.echo(record)
+
+    if not config.records and not list_records:
+        click.echo('Please set a record to update')
+
+    return
+
+
+@cli.command()
+def interfaces():
+    """Displays the available network interfaces on the device."""
+
+    local_interface = device.interfaces()
+    click.echo(style('Available interface(s):\n', fg='yellow'))
+
+    for inet, ip in local_interface.items():
+        msg = '\t' + inet.ljust(10, str(' '))
+        if ip and 'ipv4' in ip:
+            ipv4 = str(ip['ipv4'])
+            msg += 'IPv4: ' + ipv4.ljust(16, str(' '))
+        if ip and 'ipv6' in ip:
+            msg += 'IPv6: ' + ip['ipv6']
+        click.echo(msg)
+    click.echo('')
+
+    return
+
+
+@cli.command()
+@click.option('-i', '--interface', default=interface,
+              type=click.Choice(device.interfaces_only()),
+              help=IF_MSG.format(interface))
+def lan(interface):
+    """Returns the LAN IP of the selected device"""
+
+    ip = device.get_ip(interface=interface)
+    if ip:
+        click.echo(ip)
+    else:
+        click.echo('Unable to retrieve you local ip address')
+
+    return
+
+
+@cli.command()
+def logout():
+    """Logout your account from the agent."""
+    config.write('token', '')
+    click.echo('You successfully logged out.')
+
+    return
+
+
+@cli.command()
+@click.option('-f', '--force', default=False, flag_value=True,
+              help='Force the update of your IP.')
+@click.option('-s', '--silent', default=False, flag_value=True,
+              help='Do not display any output.')
+def update(force, silent):
     """Update your DNS record(s)"""
 
-    # update only if a record is set to update and that the client is
-    # authenticated
+    # update only if a record is configured and that the client is authenticated
     if config.records and config.token and config.interface and config.which_ip:
         # define which ip to update the record(s) with
         if config.which_ip == 'wan':
@@ -206,39 +215,49 @@ def update():
         else:
             ip = device.get_ip(config.interface)
 
-        if not config.known_ip or ip != config.known_ip:
-            # update the record
-            records = config.records.split(',')
-            records.remove('')
+        # Get the records
+        text_records = config.records_to_str()
+
+        # identify the IP address by resolving the record
+        record_ip = []
+        for record in text_records:
+            record_ip.extend(resolve_a_record(record))
+        record_ip = list(set(record_ip))
+
+        # update the record
+        if ip not in record_ip or len(record_ip) > 1 or force:
             results = []
-            click.echo('Updating the record(s) ...')
-            with click.progressbar(records) as update_records:
-                for record in update_records:
-                    pk, record = record.split('}')
-                    pk = pk[1:]
-                    result = api.update(pk, ip)
-                    if result:
-                        results.append(result)
+            if not silent:
+                click.echo('Updating the record(s) ...')
+                with click.progressbar(config.records_with_pk()) as bar_records:
+                    for pk, record in bar_records:
+                        result = api.update(pk, ip)
+                        if result:
+                            results.append(result)
 
-            for r in results:
-                click.echo(r['name'] + '\t' + r['content'])
+                for r in results:
+                    click.echo(r['name'] + '\t' + r['content'])
+            else:
+                for pk, record in config.records_with_pk():
+                    api.update(pk, ip)
         else:
-            click.echo('No update needed')
-
+            click.echo(NO_UPDATE) if not silent else None
         config.write('known_ip', ip)
+    else:
+        click.echo(NOTHING_HAPPENED_MSG)
 
     return
 
 
 @cli.command()
-@click.option('-t', '--text', default=False, flag_value=True,
-              help='Returns the IP in a text format.')
-def wan(text):
+@click.option('-j', '--json', default=False, flag_value=True,
+              help='Returns the IP in a JSON format.')
+def wan(json):
     """Returns your public IP"""
 
     my_ip = api.ip()
 
-    if text and 'ip' in my_ip:
+    if not(json and 'ip' in my_ip):
         my_ip = my_ip['ip']
 
     click.echo(my_ip)

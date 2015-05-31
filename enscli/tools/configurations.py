@@ -71,7 +71,8 @@ class EnlightnsConfig(object):
         if 'debug' in self.config:
             self.debug = self.config['debug']
 
-    def read(self):
+    @staticmethod
+    def read():
         '''This function load all the configurations from the file located in
         .enlightns/enlightns.conf and return all the information.
 
@@ -95,7 +96,8 @@ class EnlightnsConfig(object):
 
         return configs
 
-    def write(self, option, value):
+    @staticmethod
+    def write(option, value):
         """Sets the option=value in the configuration file
 
         :param option: the name of the option
@@ -116,11 +118,38 @@ class EnlightnsConfig(object):
 
         return option, value
 
-    def delete(self):
+    @staticmethod
+    def delete():
         """Deletes the configuration file"""
         try:
             os.remove(ENLIGHTNS_CONFIG_FULLPATH)
         except Exception, e:
             msg = 'Unable to delete the configuration file, error: {0}'
             click.echo(click.style(msg.format(e), fg='red'))
+
+    def records_to_str(self):
+        """Returns the configured records into a list of string"""
+        records = self.records.split(',')
+        records.remove('')
+        text_records = []
+        for record in records:
+            pk, record = record.split('}')
+            text_records.append(record)
+
+        return text_records
+
+    def records_with_pk(self):
+        """Returns the configured records into a list made of tuple:
+
+        [(pk, hostname), (pk, hostname)]
+        """
+        records = self.records.split(',')
+        records.remove('')
+        records_list = []
+        for record in records:
+            pk, record = record.split('}')
+            pk = pk[1:]
+            records_list.append((pk, record))
+
+        return records_list
 
