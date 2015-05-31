@@ -201,7 +201,9 @@ def set(records, ipv6, which_ip, interface, debug):
 
 
 @cli.command()
-def update():
+@click.option('-f', '--force', default=False, flag_value=True,
+              help='Force the update of your IP.')
+def update(force):
     """Update your DNS record(s)"""
 
     # update only if a record is set to update and that the client is
@@ -215,7 +217,7 @@ def update():
         else:
             ip = device.get_ip(config.interface)
 
-        if not config.known_ip or ip != config.known_ip:
+        if (not config.known_ip or ip != config.known_ip) or force:
             # update the record
             records = config.records.split(',')
             records.remove('')
