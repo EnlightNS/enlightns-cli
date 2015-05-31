@@ -127,3 +127,29 @@ class EnlightnsConfig(object):
             msg = 'Unable to delete the configuration file, error: {0}'
             click.echo(click.style(msg.format(e), fg='red'))
 
+    def records_to_str(self):
+        """Returns the configured records into a list of string"""
+        records = self.records.split(',')
+        records.remove('')
+        text_records = []
+        for record in records:
+            pk, record = record.split('}')
+            text_records.append(record)
+
+        return text_records
+
+    def records_with_pk(self):
+        """Returns the configured records into a list made of tuple:
+
+        [(pk, hostname), (pk, hostname)]
+        """
+        records = self.records.split(',')
+        records.remove('')
+        records_list = []
+        for record in records:
+            pk, record = record.split('}')
+            pk = pk[1:]
+            records_list.append((pk, record))
+
+
+
