@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, absolute_import
 
 import click
-import netifaces
+import netifaces as ni
 
 from enscli.rest.services import EnlightnsApi
 from enscli.tools.configurations import EnlightnsConfig
@@ -23,7 +23,7 @@ style = click.style
 api = EnlightnsApi()
 device = Device()
 config = EnlightnsConfig()
-local_ip, interface = netifaces.gateways()['default'][netifaces.AF_INET]
+gws_ip, interface = ni.gateways()['default'][ni.AF_INET]
 if config and config.interface:
     interface = config.interface
 
