@@ -20,7 +20,7 @@ style = click.style
 api = EnlightnsApi()
 device = Device()
 config = EnlightnsConfig()
-ip, interface = netifaces.gateways()['default'][netifaces.AF_INET]
+local_ip, interface = netifaces.gateways()['default'][netifaces.AF_INET]
 if config and config.interface:
     interface = config.interface
 
@@ -203,7 +203,9 @@ def set(records, ipv6, which_ip, interface, debug):
 @cli.command()
 @click.option('-f', '--force', default=False, flag_value=True,
               help='Force the update of your IP.')
-def update(force):
+@click.option('-s', '--silent', default=False, flag_value=True,
+              help='Do not display any output.')
+def update(force, silent):
     """Update your DNS record(s)"""
 
     # update only if a record is set to update and that the client is
@@ -222,17 +224,23 @@ def update(force):
             records = config.records.split(',')
             records.remove('')
             results = []
-            click.echo('Updating the record(s) ...')
-            with click.progressbar(records) as update_records:
-                for record in update_records:
+            if not silent:
+                click.echo('Updating the record(s) ...')
+                with click.progressbar(records) as update_records:
+                    for record in update_records:
+                        pk, record = record.split('}')
+                        pk = pk[1:]
+                        result = api.update(pk, ip)
+                        if result:
+                            results.append(result)
+
+                for r in results:
+                    click.echo(r['name'] + '\t' + r['content'])
+            else:
+                for record in records:
                     pk, record = record.split('}')
                     pk = pk[1:]
-                    result = api.update(pk, ip)
-                    if result:
-                        results.append(result)
-
-            for r in results:
-                click.echo(r['name'] + '\t' + r['content'])
+                    api.update(pk, ip)
         else:
             # TODO: implement a resolver
             click.echo('No update needed')
