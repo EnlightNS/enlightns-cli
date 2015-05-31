@@ -151,5 +151,5 @@ class EnlightnsConfig(object):
             pk = pk[1:]
             records_list.append((pk, record))
 
-
+        return records_list
 

@@ -224,7 +224,7 @@ def update(force, silent):
         record_ip = list(set(record_ip))
 
         # update the record
-        if ip not in record_ip and len(record_ip) > 1 or force:
+        if ip not in record_ip or len(record_ip) > 1 or force:
             results = []
             if not silent:
                 click.echo('Updating the record(s) ...')
