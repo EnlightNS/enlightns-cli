@@ -66,7 +66,7 @@ class Device(object):
             # We don't care about this local ip it is the gateway ip
             gws_ip, inet = ni.gateways()['default'][ni.AF_INET]
             try:
-                if not self.config.ipv6:
+                if self.config.ipv6 == 'off':
                     lan_ip = ni.ifaddresses(inet)[ni.AF_INET][0]['addr']
                     IP(lan_ip)
                 else:
