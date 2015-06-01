@@ -15,7 +15,7 @@ def resolve_a_record(hostname, nameservers=GOOGLE_NAMESERVERS):
     :param hostname: the record name to resolve
     :param nameservers: the nameservers where to resolve the record
 
-     :returns: the IP address the record has been resolved to"""
+    :returns: the IP address the record has been resolved to"""
     infos = []
     try:
         resolver = Resolver(configure=False)
@@ -47,3 +47,22 @@ def resolve_a_record(hostname, nameservers=GOOGLE_NAMESERVERS):
     # this should return only a single IP address if all DNS servers are in sync
     return infos
 
+
+def get_record_ttl(record, nameservers=GOOGLE_NAMESERVERS):
+    """This function returns the TTL of a record after it resolved it using a
+    DNS resolver.
+
+    :param record: the record to resolve
+
+    :returns: the TTL of the record
+    """
+    ttl = False
+    # try:
+    resolver = Resolver(configure=False)
+    resolver.nameservers = nameservers
+    resolution = resolver.query(record)
+    ttl = resolution.rrset.ttl
+    # except:
+    #     pass
+
+    return ttl

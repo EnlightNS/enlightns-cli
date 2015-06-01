@@ -58,6 +58,25 @@ class EnlightnsApi(object):
 
         return result
 
+    def get_ttls(self):
+        """Calls the EnlightNS API to get the TTLs of the account. It will help
+        setup the cron.
+
+        :return: a TTL list.
+        """
+        url = self.url + '/user/ttl/'
+        headers = self.auth_header
+
+        result = requests.get(url, headers=headers)
+        result = result.json() if result.ok else ''
+
+        ttl_str = ''
+        if result:
+            for ttl in result:
+                ttl_str += str(ttl['seconds']) + ', '
+
+        return ttl_str[:-2]
+
     def list_records(self):
         """List the DNS records of the user.
 
