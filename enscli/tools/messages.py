@@ -41,3 +41,7 @@ Example:
 REC_OWNER_OR_EXISTS_MSG = """Please validate that the record belongs to you or that it exists."""
 TWO_WAY_CFG_MSG = """You MUST configure the LAN and WAN records."""
 UPDATE_MSG = """Updating the record(s) ..."""
+CRON_TWO_MSG = """Cron for the TWO way mode update (enlightns.com)"""
+CRON_STD_MSG = """Cron for the standard mode update (enlightns.com)"""
+CRON_STD_WRITTEN_MSG = """The cron for the standard mode has been written."""
+CRON_TWO_WRITTEN_MSG = """The cron for the two way mode has been written."""
