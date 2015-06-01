@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
 
-import getpass
 import platform
 from distutils import spawn
 
@@ -21,9 +20,9 @@ def create_a_cron(ttl, action, comment):
     :returns: the newly created cron"""
 
     if filename:
-        cron = CronTab(user=getpass.getuser(), tabfile=filename)
+        cron = CronTab(tabfile=filename)
     else:
-        cron = CronTab(user=getpass.getuser())
+        cron = CronTab(user=True)
 
     custom_cmd = executable + ' ' + action
 
