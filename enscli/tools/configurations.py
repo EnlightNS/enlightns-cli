@@ -40,6 +40,8 @@ class EnlightnsConfig(object):
     config = {}
     token = ''
     records = []
+    record_wan = ''
+    record_lan = ''
     interface = ''
     which_ip = ''
     ipv6 = ''
@@ -55,6 +57,12 @@ class EnlightnsConfig(object):
 
         if 'records' in self.config:
             self.records = self.config['records']
+
+        if 'record_wan' in self.config:
+            self.record_wan = self.config['record_wan']
+
+        if 'record_lan' in self.config:
+            self.record_lan = self.config['record_lan']
 
         if 'interface' in self.config:
             self.interface = self.config['interface']
