@@ -19,17 +19,24 @@ def create_a_cron(ttl, action, comment):
 
     :returns: the newly created cron"""
 
-    if filename:
-        cron = CronTab(tabfile=filename)
-    else:
-        cron = CronTab(user=True)
-
     custom_cmd = executable + ' ' + action
+    is_written = False
 
+    cron = CronTab(tabfile=filename) if filename else CronTab(user=True)
+
+    # deletes the cron if it already exists
+    cron.remove_all(comment=comment)
+    cron.write()
+
+    cron = CronTab(tabfile=filename) if filename else CronTab(user=True)
+
+    # sets the new cron
     job = cron.new(command=custom_cmd, comment=comment)
     job.minute.every(ttl / 60)
-    job.enable()
-    job.cron.write()
 
-    return job.is_valid()
+    if job.is_valid():
+        cron.write()
+        is_written = True
+
+    return is_written, job.cron.render()
 

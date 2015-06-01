@@ -16,7 +16,8 @@ from enscli.tools.messages import (IF_MSG, SET_REC_MSG, REC_LIST_MSG, REC_FAIL,
                                    SET_REC_WAN_MSG, REC_OWNER_OR_EXISTS_MSG,
                                    TWO_ONLY_ONE_REC_MSG, TWO_WAY_CFG_MSG,
                                    UPDATE_MSG, CRON_TWO_MSG, CRON_STD_MSG,
-                                   CRON_TWO_WRITTEN_MSG, CRON_STD_WRITTEN_MSG)
+                                   CRON_TWO_WRITTEN_MSG, CRON_STD_WRITTEN_MSG,
+                                   CRON_EXISTS, REC_NOT_AVAIL)
 from enscli.tools.resolver import resolve_a_record, get_record_ttl
 
 
@@ -108,6 +109,8 @@ def configure(records, ipv6, which_ip, interface, debug, lan_record,
     if debug:
         config.write('debug', debug)
 
+    # TODO: make it different for lan and wan in case they give the 2 args
+    # enlightns-cli configure -l lan.enlightns.info -p wan.enlightns.info
     if config.token and (lan_record or wan_record):
         record = lan_record if lan_record else wan_record
         is_local = True if lan_record else False
@@ -138,24 +141,36 @@ def cron(two_way, agent):
     """Configure the EnlightNS agent to run through a cron"""
 
     # using the first record to get the TTL therefore the update schedule
-    if two_way:
+    if two_way and config.record_lan and config.record_wan:
         pk, record = config.get_record_and_pk(config.record_lan)
         is_owner, rec = api.check_records(record)
         if rec and is_owner:
-            cron = create_a_cron(rec['ttl'], action='two', comment=CRON_TWO_MSG)
+            is_written, cron = create_a_cron(rec['ttl'], action='two',
+                                             comment=CRON_TWO_MSG)
 
-        if cron:
+        if is_written:
             click.echo(CRON_TWO_WRITTEN_MSG)
+        else:
+            click.echo(CRON_EXISTS)
 
-    if agent:
+    if not config.record_lan or not config.record_wan:
+        click.echo(TWO_WAY_CFG_MSG)
+
+    if agent and config.records:
         record = config.records_to_str()[0]
         is_owner, rec = api.check_records(record)
         if rec and is_owner:
-            cron = create_a_cron(rec['ttl'], action='update',
-                                 comment=CRON_STD_MSG)
+            is_written, cron = create_a_cron(rec['ttl'], action='update',
+                                             comment=CRON_STD_MSG)
 
-        if cron:
+        if is_written:
             click.echo(CRON_STD_WRITTEN_MSG)
+            click.echo(cron)
+        else:
+            click.echo(CRON_EXISTS)
+
+    if not config.records:
+        click.echo(REC_NOT_AVAIL)
 
     return
 
