@@ -28,8 +28,9 @@ def create_a_cron(ttl, action, comment):
     custom_cmd = executable + ' ' + action
 
     job = cron.new(command=custom_cmd, comment=comment)
-    job.minute.every(ttl / 60)
+    job.minute().every(ttl / 60)
     job.enable()
+    job.cron.write()
 
     return job.is_valid()
 
