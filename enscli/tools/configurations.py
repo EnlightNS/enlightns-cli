@@ -161,3 +161,20 @@ class EnlightnsConfig(object):
 
         return records_list
 
+    @staticmethod
+    def get_record_and_pk(record):
+        """Returns the LAN or WAN record from the configuration file.
+
+        :param record: the record to extract the pk and record
+
+        :returns: the pk and the record
+        """
+
+        record = record.split(',')
+        record.remove('')
+        pk, record = record[0].split('}')
+        pk = pk[1:]
+
+        return pk, record
+
+

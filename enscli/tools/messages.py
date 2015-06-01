@@ -39,3 +39,5 @@ Example:
     Local   lan.enlightns.com --> 192.168.1.100
 """
 REC_OWNER_OR_EXISTS_MSG = """Please validate that the record belongs to you or that it exists."""
+TWO_WAY_CFG_MSG = """You MUST configure the LAN and WAN records."""
+UPDATE_MSG = """Updating the record(s) ..."""
