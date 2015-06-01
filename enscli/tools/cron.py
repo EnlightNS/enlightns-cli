@@ -2,8 +2,12 @@
 from __future__ import unicode_literals, absolute_import
 
 import getpass
+import platform
 
 from crontab import CronTab
+
+# Setup the configuration filename for Windows
+filename = 'filename.tab' if any(platform.win32_ver()) else False
 
 
 def create_a_cron(ttl, action, comment):
@@ -15,19 +19,17 @@ def create_a_cron(ttl, action, comment):
 
     :returns: the newly created cron"""
 
-    cron = CronTab(user=getpass.getuser())
-
-    if ttl / 60 == 1:
-        time = '* * * * *'
+    if filename:
+        cron = CronTab(user=getpass.getuser(), tabfile=filename)
     else:
-        time = '*/{0} * * * *'.format(ttl / 60)
+        cron = CronTab(user=getpass.getuser())
 
-    custom_cmd = time + ' enlightns-cli ' + action
+    custom_cmd = ' enlightns-cli ' + action
 
     job = cron.new(command=custom_cmd, comment=comment)
-    if job.is_valid():
-        job.enable()
-        cron.write()
+    job.minute.every(ttl / 60)
+    job.enable()
+    cron.write()
 
     return job.is_valid()
 
