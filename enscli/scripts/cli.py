@@ -11,7 +11,9 @@ from enscli.tools.messages import (IF_MSG, SET_REC_MSG, REC_LIST_MSG, REC_FAIL,
                                    REC_WRITE_SUCCESS, SET_IPV6_HELP,
                                    SET_WHICH_IP_HELP, SET_INET_HELP,
                                    SET_DEBUG_HELP, NOTHING_HAPPENED_MSG,
-                                   NO_UPDATE)
+                                   NO_UPDATE, TWO_HELP_MSG, SET_REC_LAN_MSG,
+                                   SET_REC_WAN_MSG, REC_OWNER_OR_EXISTS_MSG,
+                                   TWO_ONLY_ONE_REC_MSG)
 
 
 # Click utilities
@@ -61,8 +63,11 @@ def authenticate(username, password):
               type=click.Choice(device.interfaces_only()), help=SET_INET_HELP)
 @click.option('-d', '--debug', default='off', type=click.Choice(['on', 'off']),
               help=SET_DEBUG_HELP)
-def configure(records, ipv6, which_ip, interface, debug):
-    """Configure the EnlightNS agent"""
+@click.option('-l', '--lan-record', help=SET_REC_LAN_MSG)
+@click.option('-p', '--wan-record', help=SET_REC_WAN_MSG)
+def configure(records, ipv6, which_ip, interface, debug, lan_record,
+              wan_record):
+    """Configure the EnlightNS agent."""
 
     # validates ownership of the record(s)
     if config.token and records:
@@ -79,10 +84,10 @@ def configure(records, ipv6, which_ip, interface, debug):
             click.echo(REC_FAIL)
         else:
             # Write the records to the configuration file
-            record_config = ""
+            rec = ""
             for record in records_list:
-                record_config += '{' + str(record['id']) + '}' + record['name'] + ','
-            config.write('records', record_config)
+                rec = '{' + str(record['id']) + '}' + record['name'] + ','
+            config.write('records', rec)
             click.echo(REC_WRITE_SUCCESS)
 
     # set if IPv6 is supported
@@ -100,6 +105,24 @@ def configure(records, ipv6, which_ip, interface, debug):
     # set the debug on
     if debug:
         config.write('debug', debug)
+
+    if config.token and (lan_record or wan_record):
+        record = lan_record if lan_record else wan_record
+        is_local = True if lan_record else False
+        if len(record.split(',')) == 1:
+            is_owner, record = api.check_records(record=record)
+            if is_owner and record:
+                cfg = 'record_lan' if is_local else 'record_wan'
+                record = '{' + str(record['id']) + '}' + record['name'] + ','
+                config.write(cfg, record)
+                click.echo(REC_WRITE_SUCCESS)
+            else:
+                click.echo(REC_OWNER_OR_EXISTS_MSG)
+        else:
+            click.echo(TWO_ONLY_ONE_REC_MSG)
+
+    if not config.token and (records or lan_record or wan_record):
+        click.echo(NOTHING_HAPPENED_MSG)
 
     return
 
@@ -193,6 +216,35 @@ def logout():
     """Logout your account from the agent."""
     config.write('token', '')
     click.echo('You successfully logged out.')
+
+    return
+
+
+@cli.command(help=TWO_HELP_MSG)
+@click.option('-f', '--force', default=False, flag_value=True,
+              help='Force the update of your records.')
+def two(force):
+
+    if config.token and config.record_lan and config.record_wan:
+        # Gets LAN and WAN IP addresses
+        lan_ip = device.get_ip(config.interface)
+        wan_ip = api.ip()
+        if 'ip' in wan_ip:
+            wan_ip = wan_ip['ip']
+
+        # identify the LAN IP address by resolving the record
+        record_ip = resolve_a_record(config.record_lan)
+        record_ip = list(set(record_ip))
+        if lan_ip not in record_ip or len(record_ip) > 1 or force:
+            result = api.update(pk, lan_ip)
+
+        # identify the WAN IP address by resolving the record
+        record_ip = resolve_a_record(config.record_wan)
+        record_ip = list(set(record_ip))
+        if lan_ip not in record_ip or len(record_ip) > 1 or force:
+            pass
+    else:
+        click.echo('You MUST configure the LAN and WAN records.')
 
     return
 
