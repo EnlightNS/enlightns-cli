@@ -102,8 +102,7 @@ class EnlightnsApi(object):
         url = self.url + '/user/record/{pk}/'.format(pk=pk)
         headers = self.auth_header
 
-        result = requests.put(url, data={'content': ip, },
-                               headers=headers)
+        result = requests.put(url, data={'content': ip, }, headers=headers)
 
         return result.json() if result.ok else False
 

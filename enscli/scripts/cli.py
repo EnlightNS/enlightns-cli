@@ -13,7 +13,8 @@ from enscli.tools.messages import (IF_MSG, SET_REC_MSG, REC_LIST_MSG, REC_FAIL,
                                    SET_DEBUG_HELP, NOTHING_HAPPENED_MSG,
                                    NO_UPDATE, TWO_HELP_MSG, SET_REC_LAN_MSG,
                                    SET_REC_WAN_MSG, REC_OWNER_OR_EXISTS_MSG,
-                                   TWO_ONLY_ONE_REC_MSG)
+                                   TWO_ONLY_ONE_REC_MSG, TWO_WAY_CFG_MSG,
+                                   UPDATE_MSG)
 
 
 # Click utilities
@@ -26,7 +27,7 @@ api = EnlightnsApi()
 device = Device()
 config = EnlightnsConfig()
 gws_ip, interface = ni.gateways()['default'][ni.AF_INET]
-if config and config.interface:
+if config and config.interface and config.interface in device.interfaces_only():
     interface = config.interface
 
 
@@ -223,7 +224,9 @@ def logout():
 @cli.command(help=TWO_HELP_MSG)
 @click.option('-f', '--force', default=False, flag_value=True,
               help='Force the update of your records.')
-def two(force):
+@click.option('-s', '--silent', default=False, flag_value=True,
+              help='Do not display any output.')
+def two(force, silent):
 
     if config.token and config.record_lan and config.record_wan:
         # Gets LAN and WAN IP addresses
@@ -231,20 +234,32 @@ def two(force):
         wan_ip = api.ip()
         if 'ip' in wan_ip:
             wan_ip = wan_ip['ip']
+        result = []
+
+        if not silent:
+            click.echo(UPDATE_MSG)
 
         # identify the LAN IP address by resolving the record
-        record_ip = resolve_a_record(config.record_lan)
+        pk, record = config.get_record_and_pk(config.record_lan)
+        record_ip = resolve_a_record(record)
         record_ip = list(set(record_ip))
         if lan_ip not in record_ip or len(record_ip) > 1 or force:
             result = api.update(pk, lan_ip)
 
+        if result and not silent:
+            click.echo(result['name'] + '\t' + result['content'])
+
         # identify the WAN IP address by resolving the record
-        record_ip = resolve_a_record(config.record_wan)
+        pk, record = config.get_record_and_pk(config.record_wan)
+        record_ip = resolve_a_record(record)
         record_ip = list(set(record_ip))
-        if lan_ip not in record_ip or len(record_ip) > 1 or force:
-            pass
+        if wan_ip not in record_ip or len(record_ip) > 1 or force:
+            result = api.update(pk, wan_ip)
+
+        if result and not silent:
+            click.echo(result['name'] + '\t' + result['content'])
     else:
-        click.echo('You MUST configure the LAN and WAN records.')
+        click.echo(TWO_WAY_CFG_MSG)
 
     return
 
@@ -280,7 +295,7 @@ def update(force, silent):
         if ip not in record_ip or len(record_ip) > 1 or force:
             results = []
             if not silent:
-                click.echo('Updating the record(s) ...')
+                click.echo(UPDATE_MSG)
                 with click.progressbar(config.records_with_pk()) as bar_records:
                     for pk, record in bar_records:
                         result = api.update(pk, ip)
