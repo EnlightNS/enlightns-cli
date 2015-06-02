@@ -29,6 +29,12 @@ def create_a_cron(ttl, action, comment):
     cron.write()
 
     cron = CronTab(tabfile=filename) if filename else CronTab(user=True)
+    lines = list(set(cron.lines))
+    try:
+        lines.remove(u'')
+    except:
+        pass
+    cron.lines = lines
 
     # sets the new cron
     job = cron.new(command=custom_cmd, comment=comment)
