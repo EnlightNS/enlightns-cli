@@ -146,6 +146,15 @@ class EnlightnsConfig(object):
 
         return text_records
 
+    @staticmethod
+    def record_to_str(record):
+        """Returns the configured records into a list of string"""
+        record = record.split(',')
+        record.remove('')
+        pk, record = record[0].split('}')
+
+        return record
+
     def records_with_pk(self):
         """Returns the configured records into a list made of tuple:
 

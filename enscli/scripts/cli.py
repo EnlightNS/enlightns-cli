@@ -17,8 +17,9 @@ from enscli.tools.messages import (IF_MSG, SET_REC_MSG, REC_LIST_MSG, REC_FAIL,
                                    TWO_ONLY_ONE_REC_MSG, TWO_WAY_CFG_MSG,
                                    UPDATE_MSG, CRON_TWO_MSG, CRON_STD_MSG,
                                    CRON_TWO_WRITTEN_MSG, CRON_STD_WRITTEN_MSG,
-                                   CRON_EXISTS, REC_NOT_AVAIL)
-from enscli.tools.resolver import resolve_a_record, get_record_ttl
+                                   CRON_EXISTS, REC_NOT_AVAIL, CFG_RECORDS_MSG,
+                                   CFG_TWO_WAY_RECORDS, CFG_API_AVAIL_RECORDS)
+from enscli.tools.resolver import resolve_a_record
 
 
 # Click utilities
@@ -208,16 +209,28 @@ def hosts(list_records, all, text):
 
     # Default: show the record that is set in the config file
     if config.records and (not list_records and not text or all):
-        click.echo(style('Currently configured record(s) to update:\n', fg='cyan'))
+        click.echo(style(CFG_RECORDS_MSG, fg='cyan'))
         for record in config.records_to_str():
             click.echo('\t' + record)
+        click.echo('')
+
+    # show lan and wan record if they are set
+    if not text and not list_records and all and (
+        config.record_lan or config.record_wan):
+        click.echo(style(CFG_TWO_WAY_RECORDS, fg='green'))
+
+        if config.record_lan:
+            click.echo('\t' + config.record_to_str(config.record_lan))
+
+        if config.record_wan:
+            click.echo('\t' + config.record_to_str(config.record_wan))
         click.echo('')
 
     # list the records from the API
     if config.token and list_records or all:
         result = api.list_records()
         if result:
-            click.echo(style('Your DNS Records:\n', fg='yellow'))
+            click.echo(style(CFG_API_AVAIL_RECORDS, fg='yellow'))
             for record in result:
                 click.echo(
                     REC_LIST_MSG.format(record['name'],
