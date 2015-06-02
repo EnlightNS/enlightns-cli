@@ -16,8 +16,10 @@ from enscli.tools.messages import (IF_MSG, SET_REC_MSG, REC_LIST_MSG, REC_FAIL,
                                    SET_REC_WAN_MSG, REC_OWNER_OR_EXISTS_MSG,
                                    TWO_ONLY_ONE_REC_MSG, TWO_WAY_CFG_MSG,
                                    UPDATE_MSG, CRON_TWO_MSG, CRON_STD_MSG,
-                                   CRON_TWO_WRITTEN_MSG, CRON_STD_WRITTEN_MSG)
-from enscli.tools.resolver import resolve_a_record, get_record_ttl
+                                   CRON_TWO_WRITTEN_MSG, CRON_STD_WRITTEN_MSG,
+                                   CRON_EXISTS, REC_NOT_AVAIL, CFG_RECORDS_MSG,
+                                   CFG_TWO_WAY_RECORDS, CFG_API_AVAIL_RECORDS)
+from enscli.tools.resolver import resolve_a_record
 
 
 # Click utilities
@@ -90,7 +92,7 @@ def configure(records, ipv6, which_ip, interface, debug, lan_record,
             for record in records_list:
                 rec = '{' + str(record['id']) + '}' + record['name'] + ','
             config.write('records', rec)
-            click.echo(REC_WRITE_SUCCESS)
+            click.echo(REC_WRITE_SUCCESS.format(records))
 
     # set if IPv6 is supported
     if ipv6:
@@ -108,16 +110,27 @@ def configure(records, ipv6, which_ip, interface, debug, lan_record,
     if debug:
         config.write('debug', debug)
 
-    if config.token and (lan_record or wan_record):
-        record = lan_record if lan_record else wan_record
-        is_local = True if lan_record else False
-        if len(record.split(',')) == 1:
-            is_owner, record = api.check_records(record=record)
+    # sets the lan record for two way mode
+    if config.token and lan_record:
+        if len(lan_record.split(',')) == 1:
+            is_owner, record = api.check_records(record=lan_record)
             if is_owner and record:
-                cfg = 'record_lan' if is_local else 'record_wan'
                 record = '{' + str(record['id']) + '}' + record['name'] + ','
-                config.write(cfg, record)
-                click.echo(REC_WRITE_SUCCESS)
+                config.write('record_lan', record)
+                click.echo(REC_WRITE_SUCCESS.format('LAN'))
+            else:
+                click.echo(REC_OWNER_OR_EXISTS_MSG)
+        else:
+            click.echo(TWO_ONLY_ONE_REC_MSG)
+
+    # sets the wan record for two way mode
+    if config.token and wan_record:
+        if len(wan_record.split(',')) == 1:
+            is_owner, record = api.check_records(record=wan_record)
+            if is_owner and record:
+                record = '{' + str(record['id']) + '}' + record['name'] + ','
+                config.write('record_wan', record)
+                click.echo(REC_WRITE_SUCCESS.format('WAN'))
             else:
                 click.echo(REC_OWNER_OR_EXISTS_MSG)
         else:
@@ -134,28 +147,52 @@ def configure(records, ipv6, which_ip, interface, debug, lan_record,
               help='Set cron for the two way update mode.')
 @click.option('-a', '--agent', default=False, flag_value=True,
               help='Set cron for the standard update mode.')
-def cron(two_way, agent):
+@click.option('-s', '--show', default=False, flag_value=True,
+              help='Show the written cron.')
+def cron(two_way, agent, show):
     """Configure the EnlightNS agent to run through a cron"""
 
+    new_cron = False
+
     # using the first record to get the TTL therefore the update schedule
-    if two_way:
+    if two_way and config.record_lan and config.record_wan:
         pk, record = config.get_record_and_pk(config.record_lan)
         is_owner, rec = api.check_records(record)
         if rec and is_owner:
-            cron = create_a_cron(rec['ttl'], action='two', comment=CRON_TWO_MSG)
+            is_written, new_cron = create_a_cron(rec['ttl'], action='two',
+                                             comment=CRON_TWO_MSG)
 
-        if cron:
+        if is_written:
             click.echo(CRON_TWO_WRITTEN_MSG)
+        else:
+            click.echo(CRON_EXISTS)
 
-    if agent:
+    if two_way and not config.record_lan or not config.record_wan:
+        click.echo(TWO_WAY_CFG_MSG)
+
+    if agent and config.records:
         record = config.records_to_str()[0]
         is_owner, rec = api.check_records(record)
         if rec and is_owner:
-            cron = create_a_cron(rec['ttl'], action='update',
-                                 comment=CRON_STD_MSG)
+            is_written, new_cron = create_a_cron(rec['ttl'], action='update',
+                                             comment=CRON_STD_MSG)
 
-        if cron:
+        if is_written:
             click.echo(CRON_STD_WRITTEN_MSG)
+        else:
+            click.echo(CRON_EXISTS)
+
+    if show and is_written and new_cron:
+        new_cron = new_cron.strip().split('\n')
+        try:
+            new_cron.remove('')
+        except:
+            pass
+        for tab in new_cron:
+            click.echo(tab)
+
+    if agent and not config.records:
+        click.echo(REC_NOT_AVAIL)
 
     return
 
@@ -172,16 +209,28 @@ def hosts(list_records, all, text):
 
     # Default: show the record that is set in the config file
     if config.records and (not list_records and not text or all):
-        click.echo(style('Currently configured record(s) to update:\n', fg='cyan'))
+        click.echo(style(CFG_RECORDS_MSG, fg='cyan'))
         for record in config.records_to_str():
             click.echo('\t' + record)
+        click.echo('')
+
+    # show lan and wan record if they are set
+    if not text and not list_records and all and (
+        config.record_lan or config.record_wan):
+        click.echo(style(CFG_TWO_WAY_RECORDS, fg='green'))
+
+        if config.record_lan:
+            click.echo('\t' + config.record_to_str(config.record_lan))
+
+        if config.record_wan:
+            click.echo('\t' + config.record_to_str(config.record_wan))
         click.echo('')
 
     # list the records from the API
     if config.token and list_records or all:
         result = api.list_records()
         if result:
-            click.echo(style('Your DNS Records:\n', fg='yellow'))
+            click.echo(style(CFG_API_AVAIL_RECORDS, fg='yellow'))
             for record in result:
                 click.echo(
                     REC_LIST_MSG.format(record['name'],
