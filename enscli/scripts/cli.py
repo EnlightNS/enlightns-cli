@@ -29,9 +29,9 @@ style = click.style
 api = EnlightnsApi()
 device = Device()
 config = EnlightnsConfig()
-gws_ip, interface = ni.gateways()['default'][ni.AF_INET]
+gws_ip, inet = ni.gateways()['default'][ni.AF_INET]
 if config and config.interface:
-    interface = config.interface
+    inet = config.interface
 
 
 @click.group()
@@ -59,13 +59,13 @@ def authenticate(username, password):
 
 @cli.command()
 @click.option('-r', '--records', help=SET_REC_MSG)
-@click.option('-6', '--ipv6', default='off', type=click.Choice(['on', 'off']),
+@click.option('-6', '--ipv6', default=False, type=click.Choice(['on', 'off']),
               help=SET_IPV6_HELP)
 @click.option('-w', '--which-ip', default=False,
               type=click.Choice(['lan', 'wan']), help=SET_WHICH_IP_HELP)
-@click.option('-i', '--interface', default=interface,
+@click.option('-i', '--interface', default=False,
               type=click.Choice(device.interfaces_only()), help=SET_INET_HELP)
-@click.option('-d', '--debug', default='off', type=click.Choice(['on', 'off']),
+@click.option('-d', '--debug', default=False, type=click.Choice(['on', 'off']),
               help=SET_DEBUG_HELP)
 @click.option('-l', '--lan-record', help=SET_REC_LAN_MSG)
 @click.option('-p', '--wan-record', help=SET_REC_WAN_MSG)
@@ -97,18 +97,26 @@ def configure(records, ipv6, which_ip, interface, debug, lan_record,
     # set if IPv6 is supported
     if ipv6:
         config.write('ipv6', ipv6)
+    elif not ipv6 and not config.ipv6:
+        config.write('ipv6', 'off')
 
     # set if we update the record with the public or local ip address
     if which_ip in ['wan', 'lan']:
         config.write('which_ip', which_ip)
+    elif not which_ip and not config.which_ip:
+        config.write('which_ip', 'lan')
 
     # set the interface we get the ip address from
     if interface:
         config.write('interface', interface)
+    elif not interface and not config.interface:
+        config.write('interface', inet)
 
     # set the debug on
     if debug:
         config.write('debug', debug)
+    elif not debug and not config.debug:
+        config.write('debug', 'off')
 
     # sets the lan record for two way mode
     if config.token and lan_record:
