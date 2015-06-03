@@ -50,4 +50,5 @@ CRON_EXISTS = """The CronTab already exists."""
 CFG_RECORDS_MSG = """Record(s) currently configured to update:\n"""
 CFG_TWO_WAY_RECORDS = """TWO way records currently configured:\n"""
 CFG_API_AVAIL_RECORDS = """Your DNS Records: (can be set to update)\n"""
+AUTHENTICATE_MSG = """You MUST authenticate first. (enlightns-cli authenticate)"""
 
