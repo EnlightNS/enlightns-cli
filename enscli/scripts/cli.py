@@ -7,6 +7,7 @@ import netifaces as ni
 from enscli.rest.services import EnlightnsApi
 from enscli.tools.configurations import EnlightnsConfig
 from enscli.tools.cron import create_a_cron
+from enscli.tools.exceptions import EnlightnsException
 from enscli.tools.interfaces import Device
 from enscli.tools.messages import (IF_MSG, SET_REC_MSG, REC_LIST_MSG, REC_FAIL,
                                    REC_WRITE_SUCCESS, SET_IPV6_HELP,
@@ -39,8 +40,6 @@ if config and config.interface:
 @click.version_option(message='%(version)s')
 def cli():
     """Helps managing your EnlightNS Dynamic DNS"""
-    if not config.token:
-        click.echo(AUTHENTICATE_MSG)
 
 
 @cli.command()
@@ -61,19 +60,21 @@ def authenticate(username, password):
 
 @cli.command()
 @click.option('-r', '--records', help=SET_REC_MSG)
-@click.option('-6', '--ipv6', default=False, type=click.Choice(['on', 'off']),
+@click.option('-6', '--ipv6', type=click.Choice(['on', 'off']),
               help=SET_IPV6_HELP)
-@click.option('-w', '--which-ip', default=False,
-              type=click.Choice(['lan', 'wan']), help=SET_WHICH_IP_HELP)
-@click.option('-i', '--interface', default=False,
-              type=click.Choice(device.interfaces_only()), help=SET_INET_HELP)
-@click.option('-d', '--debug', default=False, type=click.Choice(['on', 'off']),
+@click.option('-w', '--which-ip', type=click.Choice(['lan', 'wan']),
+              help=SET_WHICH_IP_HELP)
+@click.option('-i', '--interface', type=click.Choice(device.interfaces_only()),
+              help=SET_INET_HELP)
+@click.option('-d', '--debug', type=click.Choice(['on', 'off']),
               help=SET_DEBUG_HELP)
 @click.option('-l', '--lan-record', help=SET_REC_LAN_MSG)
 @click.option('-p', '--wan-record', help=SET_REC_WAN_MSG)
 def configure(records, ipv6, which_ip, interface, debug, lan_record,
               wan_record):
     """Configure the EnlightNS agent."""
+    if not config.token:
+        raise EnlightnsException(AUTHENTICATE_MSG)
 
     # validates ownership of the record(s)
     if config.token and records:
@@ -161,6 +162,8 @@ def configure(records, ipv6, which_ip, interface, debug, lan_record,
               help='Show the written cron.')
 def cron(two_way, agent, show):
     """Configure the EnlightNS agent to run through a cron"""
+    if not config.token:
+        raise EnlightnsException(AUTHENTICATE_MSG)
 
     new_cron = False
 
@@ -192,6 +195,9 @@ def cron(two_way, agent, show):
         else:
             click.echo(CRON_EXISTS)
 
+    if agent and not config.records:
+        click.echo(REC_NOT_AVAIL)
+
     if show and is_written and new_cron:
         new_cron = new_cron.strip().split('\n')
         try:
@@ -201,8 +207,9 @@ def cron(two_way, agent, show):
         for tab in new_cron:
             click.echo(tab)
 
-    if agent and not config.records:
-        click.echo(REC_NOT_AVAIL)
+    if not agent and not two_way:
+        click.echo('Please choose which cron you want to write.')
+        click.echo('enlightns-cli cron --help')
 
     return
 
@@ -213,9 +220,11 @@ def cron(two_way, agent, show):
 @click.option('-a', '--all', default=False, flag_value=True,
               help='List all records including the locally set')
 @click.option('-t', '--text', default=False, flag_value=True,
-              help='Returns the DNS record in a text format.')
+              help='Returns the DNS record in a text format. (use alone)')
 def hosts(list_records, all, text):
     """Manage your DNS record(s)"""
+    if not config.token:
+        raise EnlightnsException(AUTHENTICATE_MSG)
 
     # Default: show the record that is set in the config file
     if config.records and (not list_records and not text or all):
@@ -262,6 +271,8 @@ def hosts(list_records, all, text):
 @cli.command()
 def interfaces():
     """Displays the available network interfaces on the device."""
+    if not config.token:
+        raise EnlightnsException(AUTHENTICATE_MSG)
 
     local_interface = device.interfaces()
     click.echo(style('Available interface(s):\n', fg='yellow'))
@@ -280,13 +291,18 @@ def interfaces():
 
 
 @cli.command()
-@click.option('-i', '--interface', default=False,
-              type=click.Choice(device.interfaces_only()),
+@click.option('-i', '--interface', type=click.Choice(device.interfaces_only()),
               help=IF_MSG.format(inet))
 def lan(interface):
     """Returns the LAN IP of the selected device"""
+    if not config.token:
+        raise EnlightnsException(AUTHENTICATE_MSG)
 
-    ip = device.get_ip(interface=interface)
+    if interface:
+        ip = device.get_ip(interface=interface)
+    else:
+        ip = device.get_ip(interface=config.interface)
+
     if ip:
         click.echo(ip)
     else:
@@ -310,6 +326,8 @@ def logout():
 @click.option('-s', '--silent', default=False, flag_value=True,
               help='Do not display any output.')
 def two(force, silent):
+    if not config.token:
+        raise EnlightnsException(AUTHENTICATE_MSG)
 
     if config.token and config.record_lan and config.record_wan:
         # Gets LAN and WAN IP addresses
@@ -354,6 +372,8 @@ def two(force, silent):
               help='Do not display any output.')
 def update(force, silent):
     """Update your DNS record(s)"""
+    if not config.token:
+        raise EnlightnsException(AUTHENTICATE_MSG)
 
     # update only if a record is configured and that the client is authenticated
     if config.records and config.token and config.interface and config.which_ip:
@@ -404,6 +424,8 @@ def update(force, silent):
               help='Returns the IP in a JSON format.')
 def wan(json):
     """Returns your public IP"""
+    if not config.token:
+        raise EnlightnsException(AUTHENTICATE_MSG)
 
     my_ip = api.ip()
 
