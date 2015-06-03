@@ -300,13 +300,15 @@ def lan(interface):
 
     if interface:
         ip = device.get_ip(interface=interface)
-    else:
+    elif config.interface:
         ip = device.get_ip(interface=config.interface)
+    else:
+        click.echo(SET_INET_HELP)
 
     if ip:
         click.echo(ip)
     else:
-        click.echo('Unable to retrieve you local ip address')
+        click.echo('Unable to retrieve your local ip address')
 
     return
 
