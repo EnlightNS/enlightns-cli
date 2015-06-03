@@ -18,7 +18,8 @@ from enscli.tools.messages import (IF_MSG, SET_REC_MSG, REC_LIST_MSG, REC_FAIL,
                                    UPDATE_MSG, CRON_TWO_MSG, CRON_STD_MSG,
                                    CRON_TWO_WRITTEN_MSG, CRON_STD_WRITTEN_MSG,
                                    CRON_EXISTS, REC_NOT_AVAIL, CFG_RECORDS_MSG,
-                                   CFG_TWO_WAY_RECORDS, CFG_API_AVAIL_RECORDS)
+                                   CFG_TWO_WAY_RECORDS, CFG_API_AVAIL_RECORDS,
+                                   AUTHENTICATE_MSG)
 from enscli.tools.resolver import resolve_a_record
 
 
@@ -38,7 +39,8 @@ if config and config.interface:
 @click.version_option(message='%(version)s')
 def cli():
     """Helps managing your EnlightNS Dynamic DNS"""
-    pass
+    if not config.token:
+        click.echo(AUTHENTICATE_MSG)
 
 
 @cli.command()
