@@ -93,7 +93,7 @@ def configure(records, ipv6, which_ip, interface, debug, lan_record,
             # Write the records to the configuration file
             rec = ""
             for record in records_list:
-                rec = '{' + str(record['id']) + '}' + record['name'] + ','
+                rec += '{' + str(record['id']) + '}' + record['name'] + ','
             config.write('records', rec)
             click.echo(REC_WRITE_SUCCESS.format(records))
 
