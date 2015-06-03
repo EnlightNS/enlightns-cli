@@ -282,7 +282,7 @@ def interfaces():
 @cli.command()
 @click.option('-i', '--interface', default=False,
               type=click.Choice(device.interfaces_only()),
-              help=IF_MSG.format(interface))
+              help=IF_MSG.format(inet))
 def lan(interface):
     """Returns the LAN IP of the selected device"""
 
