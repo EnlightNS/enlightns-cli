@@ -30,7 +30,7 @@ api = EnlightnsApi()
 device = Device()
 config = EnlightnsConfig()
 gws_ip, interface = ni.gateways()['default'][ni.AF_INET]
-if config and config.interface and config.interface in device.interfaces_only():
+if config and config.interface:
     interface = config.interface
 
 
@@ -61,7 +61,7 @@ def authenticate(username, password):
 @click.option('-r', '--records', help=SET_REC_MSG)
 @click.option('-6', '--ipv6', default='off', type=click.Choice(['on', 'off']),
               help=SET_IPV6_HELP)
-@click.option('-w', '--which-ip', default='lan',
+@click.option('-w', '--which-ip', default=False,
               type=click.Choice(['lan', 'wan']), help=SET_WHICH_IP_HELP)
 @click.option('-i', '--interface', default=interface,
               type=click.Choice(device.interfaces_only()), help=SET_INET_HELP)
@@ -99,7 +99,7 @@ def configure(records, ipv6, which_ip, interface, debug, lan_record,
         config.write('ipv6', ipv6)
 
     # set if we update the record with the public or local ip address
-    if which_ip:
+    if which_ip in ['wan', 'lan']:
         config.write('which_ip', which_ip)
 
     # set the interface we get the ip address from
@@ -270,7 +270,7 @@ def interfaces():
 
 
 @cli.command()
-@click.option('-i', '--interface', default=interface,
+@click.option('-i', '--interface', default=False,
               type=click.Choice(device.interfaces_only()),
               help=IF_MSG.format(interface))
 def lan(interface):
