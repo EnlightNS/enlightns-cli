@@ -378,45 +378,45 @@ def update(force, silent):
         raise EnlightnsException(AUTHENTICATE_MSG)
 
     # update only if a record is configured and that the client is authenticated
-    if config.records and config.token and config.interface and config.which_ip:
-        # define which ip to update the record(s) with
-        if config.which_ip == 'wan':
-            ip = api.ip()
-            if 'ip' in ip:
-                ip = ip['ip']
-        else:
-            ip = device.get_ip(config.interface)
+    if not (config.records and config.token and config.interface and config.which_ip):
+        raise EnlightnsException(NOTHING_HAPPENED_MSG)
 
-        # Get the records
-        text_records = config.records_to_str()
-
-        # identify the IP address by resolving the record
-        record_ip = []
-        for record in text_records:
-            record_ip.extend(resolve_a_record(record))
-        record_ip = list(set(record_ip))
-
-        # update the record
-        if ip not in record_ip or len(record_ip) > 1 or force:
-            results = []
-            if not silent:
-                click.echo(UPDATE_MSG)
-                with click.progressbar(config.records_with_pk()) as bar_records:
-                    for pk, record in bar_records:
-                        result = api.update(pk, ip)
-                        if result:
-                            results.append(result)
-
-                for r in results:
-                    click.echo(r['name'] + '\t' + r['content'])
-            else:
-                for pk, record in config.records_with_pk():
-                    api.update(pk, ip)
-        else:
-            click.echo(NO_UPDATE) if not silent else None
-        config.write('known_ip', ip)
+    # define which ip to update the record(s) with
+    if config.which_ip == 'wan':
+        ip = api.ip()
+        if 'ip' in ip:
+            ip = ip['ip']
     else:
-        click.echo(NOTHING_HAPPENED_MSG)
+        ip = device.get_ip(config.interface)
+
+    # Get the records
+    text_records = config.records_to_str()
+
+    # identify the IP address by resolving the record
+    record_ip = []
+    for record in text_records:
+        record_ip.extend(resolve_a_record(record))
+    record_ip = list(set(record_ip))
+
+    # update the record
+    if ip not in record_ip or len(record_ip) > 1 or force:
+        results = []
+        if not silent:
+            click.echo(UPDATE_MSG)
+            with click.progressbar(config.records_with_pk()) as bar_records:
+                for pk, record in bar_records:
+                    result = api.update(pk, ip)
+                    if result:
+                        results.append(result)
+
+            for r in results:
+                click.echo(r['name'] + '\t' + r['content'])
+        else:
+            for pk, record in config.records_with_pk():
+                api.update(pk, ip)
+    else:
+        click.echo(NO_UPDATE) if not silent else None
+    config.write('known_ip', ip)
 
     return
 
