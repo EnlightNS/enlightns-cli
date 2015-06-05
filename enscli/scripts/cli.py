@@ -128,7 +128,8 @@ def configure(records, ipv6, which_ip, interface, debug, lan_record,
     # sets the lan record for two way mode
     if lan_record and not len(lan_record.split(',')) == 1:
         raise EnlightnsException(TWO_ONLY_ONE_REC_MSG)
-    else:
+
+    if lan_record and len(lan_record.split(',')) == 1:
         is_owner, record = api.check_records(record=lan_record)
         if not (is_owner and record):
             raise EnlightnsException(REC_OWNER_OR_EXISTS_MSG)
@@ -140,7 +141,8 @@ def configure(records, ipv6, which_ip, interface, debug, lan_record,
     # sets the wan record for two way mode
     if wan_record and not len(wan_record.split(',')) == 1:
         raise EnlightnsException(TWO_ONLY_ONE_REC_MSG)
-    else:
+
+    if wan_record and len(wan_record.split(',')) == 1:
         is_owner, record = api.check_records(record=wan_record)
         if not (is_owner and record):
             raise EnlightnsException(REC_OWNER_OR_EXISTS_MSG)
