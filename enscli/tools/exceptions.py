@@ -11,9 +11,8 @@ class EnlightnsException(ClickException):
     We only overwrite the exception message
     """
     def __init__(self, message):
-        if PY2:
-            if message is not None:
-                message = message.encode('utf-8')
+        if PY2 and message is not None:
+            message = message.encode('utf-8')
         ClickException.__init__(self, message)
         self.message = message
 

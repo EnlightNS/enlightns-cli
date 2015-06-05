@@ -20,7 +20,7 @@ from enscli.tools.messages import (IF_MSG, SET_REC_MSG, REC_LIST_MSG, REC_FAIL,
                                    CRON_TWO_WRITTEN_MSG, CRON_STD_WRITTEN_MSG,
                                    CRON_EXISTS, REC_NOT_AVAIL, CFG_RECORDS_MSG,
                                    CFG_TWO_WAY_RECORDS, CFG_API_AVAIL_RECORDS,
-                                   AUTHENTICATE_MSG)
+                                   AUTHENTICATE_MSG, CANNOT_AUTHENTICATE)
 from enscli.tools.resolver import resolve_a_record
 
 
@@ -49,11 +49,11 @@ def authenticate(username, password):
     """Authenticate your account on EnlightNS.com"""
     token = api.authenticate(username=username, password=password)
 
-    if token:
+    if not token:
+        raise EnlightnsException(CANNOT_AUTHENTICATE)
+    else:
         config.write('token', token)
         click.echo('Successfully authenticated')
-    else:
-        click.echo('Unable to authenticate your account, please try again.')
 
     return
 
@@ -76,8 +76,12 @@ def configure(records, ipv6, which_ip, interface, debug, lan_record,
     if not config.token:
         raise EnlightnsException(AUTHENTICATE_MSG)
 
+    if not (records or ipv6 or which_ip or interface or debug or lan_record or
+            wan_record):
+        raise EnlightnsException("enlightns-cli configure --help")
+
     # validates ownership of the record(s)
-    if config.token and records:
+    if records:
         valid_list = []
         records_list = []
         click.echo('Validating the records ...')
@@ -88,7 +92,7 @@ def configure(records, ipv6, which_ip, interface, debug, lan_record,
                 records_list.append(record)
 
         if False in valid_list:
-            click.echo(REC_FAIL)
+            raise EnlightnsException(REC_FAIL)
         else:
             # Write the records to the configuration file
             rec = ""
@@ -122,33 +126,28 @@ def configure(records, ipv6, which_ip, interface, debug, lan_record,
         config.write('debug', 'off')
 
     # sets the lan record for two way mode
-    if config.token and lan_record:
-        if len(lan_record.split(',')) == 1:
-            is_owner, record = api.check_records(record=lan_record)
-            if is_owner and record:
-                record = '{' + str(record['id']) + '}' + record['name'] + ','
-                config.write('record_lan', record)
-                click.echo(REC_WRITE_SUCCESS.format('LAN'))
-            else:
-                click.echo(REC_OWNER_OR_EXISTS_MSG)
+    if lan_record and not len(lan_record.split(',')) == 1:
+        raise EnlightnsException(TWO_ONLY_ONE_REC_MSG)
+    else:
+        is_owner, record = api.check_records(record=lan_record)
+        if not (is_owner and record):
+            raise EnlightnsException(REC_OWNER_OR_EXISTS_MSG)
         else:
-            click.echo(TWO_ONLY_ONE_REC_MSG)
+            record = '{' + str(record['id']) + '}' + record['name'] + ','
+            config.write('record_lan', record)
+            click.echo(REC_WRITE_SUCCESS.format('LAN'))
 
     # sets the wan record for two way mode
-    if config.token and wan_record:
-        if len(wan_record.split(',')) == 1:
-            is_owner, record = api.check_records(record=wan_record)
-            if is_owner and record:
-                record = '{' + str(record['id']) + '}' + record['name'] + ','
-                config.write('record_wan', record)
-                click.echo(REC_WRITE_SUCCESS.format('WAN'))
-            else:
-                click.echo(REC_OWNER_OR_EXISTS_MSG)
+    if wan_record and not len(wan_record.split(',')) == 1:
+        raise EnlightnsException(TWO_ONLY_ONE_REC_MSG)
+    else:
+        is_owner, record = api.check_records(record=wan_record)
+        if not (is_owner and record):
+            raise EnlightnsException(REC_OWNER_OR_EXISTS_MSG)
         else:
-            click.echo(TWO_ONLY_ONE_REC_MSG)
-
-    if not config.token and (records or lan_record or wan_record):
-        click.echo(NOTHING_HAPPENED_MSG)
+            record = '{' + str(record['id']) + '}' + record['name'] + ','
+            config.write('record_wan', record)
+            click.echo(REC_WRITE_SUCCESS.format('WAN'))
 
     return
 
@@ -162,28 +161,37 @@ def configure(records, ipv6, which_ip, interface, debug, lan_record,
               help='Show the written cron.')
 def cron(two_way, agent, show):
     """Configure the EnlightNS agent to run through a cron"""
+
+    new_cron = False
+    is_written = False
+
     if not config.token:
         raise EnlightnsException(AUTHENTICATE_MSG)
 
-    new_cron = False
+    if two_way and not (config.record_lan or config.record_wan):
+        raise EnlightnsException(TWO_WAY_CFG_MSG)
 
-    # using the first record to get the TTL therefore the update schedule
-    if two_way and config.record_lan and config.record_wan:
+    if agent and not config.records:
+        raise EnlightnsException(REC_NOT_AVAIL)
+
+    if not agent and not two_way:
+        click.echo('Please choose which cron you want to write.')
+        click.echo('enlightns-cli cron --help')
+
+    if two_way:
+        # using the first record to get the TTL therefore the update schedule
         pk, record = config.get_record_and_pk(config.record_lan)
         is_owner, rec = api.check_records(record)
         if rec and is_owner:
             is_written, new_cron = create_a_cron(rec['ttl'], action='two',
-                                             comment=CRON_TWO_MSG)
+                                            comment=CRON_TWO_MSG)
 
         if is_written:
             click.echo(CRON_TWO_WRITTEN_MSG)
         else:
             click.echo(CRON_EXISTS)
 
-    if two_way and not config.record_lan or not config.record_wan:
-        click.echo(TWO_WAY_CFG_MSG)
-
-    if agent and config.records:
+    if agent:
         record = config.records_to_str()[0]
         is_owner, rec = api.check_records(record)
         if rec and is_owner:
@@ -195,9 +203,6 @@ def cron(two_way, agent, show):
         else:
             click.echo(CRON_EXISTS)
 
-    if agent and not config.records:
-        click.echo(REC_NOT_AVAIL)
-
     if show and is_written and new_cron:
         new_cron = new_cron.strip().split('\n')
         try:
@@ -206,10 +211,6 @@ def cron(two_way, agent, show):
             pass
         for tab in new_cron:
             click.echo(tab)
-
-    if not agent and not two_way:
-        click.echo('Please choose which cron you want to write.')
-        click.echo('enlightns-cli cron --help')
 
     return
 
@@ -234,8 +235,8 @@ def hosts(list_records, all, text):
         click.echo('')
 
     # show lan and wan record if they are set
-    if not text and not list_records and all and (
-        config.record_lan or config.record_wan):
+    if not text and not list_records and all and (config.record_lan
+                                                  and config.record_wan):
         click.echo(style(CFG_TWO_WAY_RECORDS, fg='green'))
 
         if config.record_lan:
@@ -246,7 +247,7 @@ def hosts(list_records, all, text):
         click.echo('')
 
     # list the records from the API
-    if config.token and list_records or all:
+    if list_records or all:
         result = api.list_records()
         if result:
             click.echo(style(CFG_API_AVAIL_RECORDS, fg='yellow'))
@@ -271,8 +272,6 @@ def hosts(list_records, all, text):
 @cli.command()
 def interfaces():
     """Displays the available network interfaces on the device."""
-    if not config.token:
-        raise EnlightnsException(AUTHENTICATE_MSG)
 
     local_interface = device.interfaces()
     click.echo(style('Available interface(s):\n', fg='yellow'))
@@ -295,8 +294,8 @@ def interfaces():
               help=IF_MSG.format(inet))
 def lan(interface):
     """Returns the LAN IP of the selected device"""
-    if not config.token:
-        raise EnlightnsException(AUTHENTICATE_MSG)
+    if not interface and not config.interface:
+        raise EnlightnsException(SET_INET_HELP)
 
     if interface:
         ip = device.get_ip(interface=interface)
@@ -306,7 +305,7 @@ def lan(interface):
     if ip:
         click.echo(ip)
     else:
-        click.echo('Unable to retrieve you local ip address')
+        click.echo('Unable to retrieve your local ip address')
 
     return
 
@@ -329,7 +328,9 @@ def two(force, silent):
     if not config.token:
         raise EnlightnsException(AUTHENTICATE_MSG)
 
-    if config.token and config.record_lan and config.record_wan:
+    if not (config.token and config.record_lan and config.record_wan):
+        raise EnlightnsException(TWO_WAY_CFG_MSG)
+    else:
         # Gets LAN and WAN IP addresses
         lan_ip = device.get_ip(config.interface)
         wan_ip = api.ip()
@@ -359,8 +360,6 @@ def two(force, silent):
 
         if result and not silent:
             click.echo(result['name'] + '\t' + result['content'])
-    else:
-        click.echo(TWO_WAY_CFG_MSG)
 
     return
 
@@ -376,45 +375,46 @@ def update(force, silent):
         raise EnlightnsException(AUTHENTICATE_MSG)
 
     # update only if a record is configured and that the client is authenticated
-    if config.records and config.token and config.interface and config.which_ip:
-        # define which ip to update the record(s) with
-        if config.which_ip == 'wan':
-            ip = api.ip()
-            if 'ip' in ip:
-                ip = ip['ip']
-        else:
-            ip = device.get_ip(config.interface)
+    if not (config.records and config.token and config.interface
+            and config.which_ip):
+        raise EnlightnsException(NOTHING_HAPPENED_MSG)
 
-        # Get the records
-        text_records = config.records_to_str()
-
-        # identify the IP address by resolving the record
-        record_ip = []
-        for record in text_records:
-            record_ip.extend(resolve_a_record(record))
-        record_ip = list(set(record_ip))
-
-        # update the record
-        if ip not in record_ip or len(record_ip) > 1 or force:
-            results = []
-            if not silent:
-                click.echo(UPDATE_MSG)
-                with click.progressbar(config.records_with_pk()) as bar_records:
-                    for pk, record in bar_records:
-                        result = api.update(pk, ip)
-                        if result:
-                            results.append(result)
-
-                for r in results:
-                    click.echo(r['name'] + '\t' + r['content'])
-            else:
-                for pk, record in config.records_with_pk():
-                    api.update(pk, ip)
-        else:
-            click.echo(NO_UPDATE) if not silent else None
-        config.write('known_ip', ip)
+    # define which ip to update the record(s) with
+    if config.which_ip == 'wan':
+        ip = api.ip()
+        if 'ip' in ip:
+            ip = ip['ip']
     else:
-        click.echo(NOTHING_HAPPENED_MSG)
+        ip = device.get_ip(config.interface)
+
+    # Get the records
+    text_records = config.records_to_str()
+
+    # identify the IP address by resolving the record
+    record_ip = []
+    for record in text_records:
+        record_ip.extend(resolve_a_record(record))
+    record_ip = list(set(record_ip))
+
+    # update the record
+    if ip not in record_ip or len(record_ip) > 1 or force:
+        results = []
+        if not silent:
+            click.echo(UPDATE_MSG)
+            with click.progressbar(config.records_with_pk()) as bar_records:
+                for pk, record in bar_records:
+                    result = api.update(pk, ip)
+                    if result:
+                        results.append(result)
+
+            for r in results:
+                click.echo(r['name'] + '\t' + r['content'])
+        else:
+            for pk, record in config.records_with_pk():
+                api.update(pk, ip)
+    else:
+        click.echo(NO_UPDATE) if not silent else None
+    config.write('known_ip', ip)
 
     return
 

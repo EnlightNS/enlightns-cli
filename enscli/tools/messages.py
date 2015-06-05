@@ -21,9 +21,13 @@ REC_NOT_AVAIL = """You MUST sets a record first."""
 REC_WRITE_SUCCESS = """Successfully wrote the {0} record to your configuration file."""
 SET_IPV6_HELP = """Set to use IPv6 address"""
 SET_WHICH_IP_HELP = """Set which IP it will use to update the DNS record"""
-SET_INET_HELP = """Set which interface to use for the updates"""
+SET_INET_HELP = """Set which interface to use for the updates
+
+Usage:
+
+    enlightns-cli configure -i eth0"""
 SET_DEBUG_HELP = """Turn on|off debug"""
-NOTHING_HAPPENED_MSG = """Did you authenticate the agent? or Is it well configured?"""
+NOTHING_HAPPENED_MSG = """It looks like you didn't configure a record to be updated."""
 NO_UPDATE = """No update needed."""
 TWO_ONLY_ONE_REC_MSG = """You can only use one DNS record using the Two way mode."""
 TWO_HELP_MSG = """Two way update mode.
@@ -51,4 +55,5 @@ CFG_RECORDS_MSG = """Record(s) currently configured to update:\n"""
 CFG_TWO_WAY_RECORDS = """TWO way records currently configured:\n"""
 CFG_API_AVAIL_RECORDS = """Your DNS Records: (can be set to update)\n"""
 AUTHENTICATE_MSG = """You MUST be authenticated. --> enlightns-cli authenticate"""
+CANNOT_AUTHENTICATE = """Unable to authenticate your account, please try again."""
 
