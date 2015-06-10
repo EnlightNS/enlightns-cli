@@ -3,6 +3,7 @@ from __future__ import unicode_literals, absolute_import
 
 import platform
 from distutils import spawn
+from datetime import datetime, timedelta
 
 from crontab import CronTab
 
@@ -38,7 +39,15 @@ def create_a_cron(ttl, action, comment):
 
     # sets the new cron
     job = cron.new(command=custom_cmd, comment=comment)
-    job.minute.every(ttl / 60)
+    days, hours, minutes, seconds = extract_time(ttl)
+    if days:
+        job.every(days).days()
+    elif hours:
+        job.hour.every(hours)
+    elif minutes:
+        job.minute.every(minutes)
+    elif seconds:
+        job.minute.every(seconds)
 
     if job.is_valid():
         cron.write()
@@ -46,3 +55,20 @@ def create_a_cron(ttl, action, comment):
 
     return is_written, job.cron.render()
 
+
+def extract_time(seconds):
+    """This function extracts the time of the DNS record and convert it in
+    second, minute, hour and day
+
+    e.g.:
+
+        84600 == 0 minutes 0 hours 1 day
+
+    :param seconds: the TTL in seconds to convert
+
+    :return: days, hours, minutes, seconds values out of the seconds
+    """
+    sec = timedelta(seconds=seconds)
+    my_date = datetime(1, 1, 1) + sec
+
+    return my_date.day-1, my_date.hour, my_date.minute, my_date.second

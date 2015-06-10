@@ -178,14 +178,17 @@ def cron(two_way, agent, show):
 
     if not agent and not two_way:
         click.echo('Please choose which cron you want to write.')
-        click.echo('enlightns-cli cron --help')
+        raise EnlightnsException('enlightns-cli cron --help')
 
     if two_way:
         # using the first record to get the TTL therefore the update schedule
         pk, record = config.get_record_and_pk(config.record_lan)
+        wan_pk, wan_record = config.get_record_and_pk(config.record_wan)
         is_owner, rec = api.check_records(record)
-        if rec and is_owner:
-            is_written, new_cron = create_a_cron(rec['ttl'], action='two',
+        w_is_owner, w_rec = api.check_records(wan_record)
+        if rec and w_rec and is_owner:
+            ttl = rec['ttl'] if rec['ttl'] <= w_rec['ttl'] else w_rec['ttl']
+            is_written, new_cron = create_a_cron(ttl, action='two',
                                             comment=CRON_TWO_MSG)
 
         if is_written:
@@ -353,6 +356,9 @@ def two(force, silent):
         if result and not silent:
             click.echo(result['name'] + '\t' + result['content'])
 
+        if not result and not silent:
+            click.echo('No update needed for the LAN Record')
+
         # identify the WAN IP address by resolving the record
         pk, record = config.get_record_and_pk(config.record_wan)
         record_ip = resolve_a_record(record)
@@ -362,6 +368,9 @@ def two(force, silent):
 
         if result and not silent:
             click.echo(result['name'] + '\t' + result['content'])
+
+        if not result and not silent:
+            click.echo('No update needed for the WAN Record')
 
     return
 
