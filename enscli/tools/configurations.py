@@ -3,10 +3,13 @@ from __future__ import unicode_literals, absolute_import
 
 from ConfigParser import ConfigParser
 import os
+import shutil
+
 import click
 
 from enscli.settings import (ENLIGHTNS_CONFIG_FULLPATH,
                              ENLIGHTNS_CONFIG_SECTION, )
+from enscli.tools.messages import ERROR_WHILE_DELETING_CONFIG
 
 
 class EnlightnsConfig(object):
@@ -186,4 +189,21 @@ class EnlightnsConfig(object):
 
         return pk, record
 
+    @staticmethod
+    def logout():
+        """Returns the LAN or WAN record from the configuration file.
+
+        :param record: the record to extract the pk and record
+
+        :returns: the pk and the record
+        """
+
+        try:
+            shutil.rmtree(ENLIGHTNS_CONFIG_FULLPATH, ignore_errors=True)
+            failed = False
+        except Exception, e:
+            click.echo(ERROR_WHILE_DELETING_CONFIG)
+            failed = True
+
+        return failed
 

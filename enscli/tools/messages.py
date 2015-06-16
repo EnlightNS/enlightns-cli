@@ -56,4 +56,5 @@ CFG_TWO_WAY_RECORDS = """TWO way records currently configured:\n"""
 CFG_API_AVAIL_RECORDS = """Your DNS Records: (can be set to update)\n"""
 AUTHENTICATE_MSG = """You MUST be authenticated. --> enlightns-cli authenticate"""
 CANNOT_AUTHENTICATE = """Unable to authenticate your account, please try again."""
+ERROR_WHILE_DELETING_CONFIG = """An error occured while deleting the configuration file."""
 

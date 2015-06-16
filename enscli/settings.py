@@ -2,12 +2,11 @@
 from __future__ import unicode_literals, absolute_import
 
 import os
-from os.path import expanduser
-home = expanduser("~")
+
 
 ENLIGHTNS_API_URL = 'http://devapi.enlightns.com'
 ENLIGHTNS_API_DEBUG_URL = 'http://127.0.0.1:8000'
-ENLIGHTNS_BASE_DIR = home
+ENLIGHTNS_BASE_DIR = os.path.expanduser("~")
 ENLIGHTNS_CONFIG_DIR = ENLIGHTNS_BASE_DIR + '/.enlightns'
 ENLIGHTNS_CONFIG_FILE = 'enlightns.conf'
 ENLIGHTNS_CONFIG_FULLPATH = ENLIGHTNS_CONFIG_DIR + '/' + ENLIGHTNS_CONFIG_FILE
