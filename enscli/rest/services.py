@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
+import json
 
 import requests
-import json
 
 from enscli.settings import ENLIGHTNS_API_URL, ENLIGHTNS_API_DEBUG_URL
 from enscli.tools.configurations import EnlightnsConfig
 from enscli.tools.interfaces import Device
+
 
 class EnlightnsApi(object):
     """The class that will encapsulate all the calls we can do to the EnlightNS
@@ -124,5 +125,3 @@ class EnlightnsApi(object):
         result = requests.put(url, data={'content': ip, }, headers=headers)
 
         return result.json() if result.ok else False
-
-

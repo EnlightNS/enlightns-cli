@@ -318,7 +318,7 @@ def lan(interface):
 @cli.command()
 def logout():
     """Logout your account from the agent."""
-    config.write('token', '')
+    config.logout()
     click.echo('You successfully logged out.')
 
     return
