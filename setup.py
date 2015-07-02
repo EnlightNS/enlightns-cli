@@ -10,8 +10,16 @@ with open('enscli/__init__.py', 'r') as fd:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
                         fd.read(), re.MULTILINE).group(1)
 
-with open('requirements.txt') as f:
-    requirements = f.read().splitlines()
+def get_requirements():
+    """Simply read the requirements.txt file and returns the list of the dependencies.
+
+    :returns: list of requirements
+    """
+    requirements = []
+    with open('requirements.txt') as f:
+        requirements = f.read().splitlines()
+
+    return requirements
 
 if not version:
     raise RuntimeError('Cannot find version information')
@@ -43,7 +51,7 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
     ),
-    install_requires=requirements,
+    install_requires=get_requirements(),
     entry_points='''
         [console_scripts]
         enlightns-cli=enscli.scripts.cli:cli
