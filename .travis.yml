@@ -1,8 +1,14 @@
 language: python
 python:
+- '2.6'
 - '2.7'
+- '3.2'
+- '3.3'
+- '3.4'
 script:
-- touch foo
+- make test
+install:
+- pip install .
 deploy:
   provider: pypi
   user: d2s3admin
@@ -11,3 +17,7 @@ deploy:
   on:
     tags: true
     branch: master
+notifications:
+  email: false
+  slack:
+    secure: C1LGF/oU/NbgZgPCOMQeh5A7AAWrL3s6QX/FdUWw91QjLfBLJYIyEDcWIw1N8KeiHsLelfUQh9feGJfQVHWjjmn4auNbbykFQC5N9BrKvD5F8IE61ck3YSck7leqNpB/GnNybbqHNJD2X6/su+oCBOhyk60XdFbBMIWTlch4cJRWbzymDFM86xIkR5pJhGZXmbj2RlXsrPPSoFKgHOjrfLQP0bACKhZnymkvMPQlm0CWIOeX6prv/8BAsAgEUOqnXCr1UQUVKcbxmDEQ1KCpyzH3jIl1aXG/wh/cp0uF+urYEfpTRDsbl21MiztMTJcqbHgC1fhhkNGhtNvCBAmNc3JpavF+iI4gHuUSRJa+tPGsPndMlNsqu3xwJ0gW2vGj8admdHEWIkK3P2GkqB8ZVK673mLYSo4c1beOU6kr55Tq2MPhSg+znq0cYN3/gDCoBqVmedA4qeG1NrBpvvHodBfRt6AM8Gyn1uQme+NXShf2ovNP0o3lGKyLx0b9vsnbf8bUH/a7wc0CeDTPWh5YNB+aXN/1mSnGmUS/Peu0vIuvcxe8ZXJfXjMFlFcyV0p/SyI5B0BGoIThgODZCqQBZiECoHfJvXv0Cvxsy4kLrdZssNpNVqAYGtQebnU486Y3Nx5aYKbnRFFZUMqx7AJ2nhG+FkNVkI7QAhtxo2ujgU0=

@@ -1,0 +1,3 @@
+include Makefile README LICENSE
+recursive-exclude *.pyc
+recursive-exclude *.pyo
