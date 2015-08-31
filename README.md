@@ -1,6 +1,6 @@
 EnlightNS.com Command Line Interface
 
-!https://travis-ci.org/EnlightNS/enlightns-cli.svg?branch=develop!:https://travis-ci.org/EnlightNS/enlightns-cli
+[![Build Status](https://travis-ci.org/EnlightNS/enlightns-cli.svg?branch=develop)](https://travis-ci.org/EnlightNS/enlightns-cli)
 
 # Testing the app clone the repository and activate your virtualenv.
 Once it is activated within the repository folder execute the following command line:
