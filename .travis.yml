@@ -1,0 +1,21 @@
+language: python
+python:
+- '2.6'
+- '2.7'
+#- '3.3'
+script:
+- make test
+install:
+- pip install .
+deploy:
+  provider: pypi
+  user: d2s3admin
+  password:
+    secure: 7PK6ZTCqOOGp4DtQbwJ5YLqTRxQgoe2KToNkqXHLQaCfL0YErWSyeI/asEICxwuj76ZsNI/EFvUsCCi7aatYDQW59Ec9gHnyB0hw/k9NDwKSOJc5TT3KvT61w/39nncb+ft8RJiY1r2AGPpUS4FtwWCIdD/lkqQo6Dq21WuShod7nZhiNbrhbHfYj0oaoQUwaiESfFaoqrJ4t0ax2EqR5ydnBKauhg5EyEPpWKnY8oweFQZe+MZWnYnfnkY4F8bM3MJ9Mq9JRIic/NdxWUW9xnwR6z5s8gSEX9vijjqIqQxkPERTIryd4HZQmiUYPnEgoBROfy6DlM2K0ZAhHedhCZk6DmyUbKEQLac00fU3vyPZ+6P71c1/tNiOrR8IQSFEFc3X2kBtO1MTLJhkNeas8Vzpl38mWKi8VvKekfZ7dNiq2inTMap7npPVwilHeyMQT+5w8IyazbpGSjiyibItN4zchRAJtgy3mQteWIPnt7EOPW8lv3YI7sFFdKsc8SuV6/e8D/T49p23+aiLJvgrSUWtLieS5IJhqC/+QcM4db/d5LgbLl6FmaoLbLbuDm1MGwq/J7AUufFgKzjp18MXWBV3pEpMaO3JwlHJ0Lunz3YPk0HO6CgraqxWy3zr8EdKQ2goANpgiNTP7Rnc4IA0eWDLpsF/lBHKR0gN9FKN6kM=
+  on:
+    tags: true
+    branch: master
+notifications:
+  email: false
+  slack:
+    secure: C1LGF/oU/NbgZgPCOMQeh5A7AAWrL3s6QX/FdUWw91QjLfBLJYIyEDcWIw1N8KeiHsLelfUQh9feGJfQVHWjjmn4auNbbykFQC5N9BrKvD5F8IE61ck3YSck7leqNpB/GnNybbqHNJD2X6/su+oCBOhyk60XdFbBMIWTlch4cJRWbzymDFM86xIkR5pJhGZXmbj2RlXsrPPSoFKgHOjrfLQP0bACKhZnymkvMPQlm0CWIOeX6prv/8BAsAgEUOqnXCr1UQUVKcbxmDEQ1KCpyzH3jIl1aXG/wh/cp0uF+urYEfpTRDsbl21MiztMTJcqbHgC1fhhkNGhtNvCBAmNc3JpavF+iI4gHuUSRJa+tPGsPndMlNsqu3xwJ0gW2vGj8admdHEWIkK3P2GkqB8ZVK673mLYSo4c1beOU6kr55Tq2MPhSg+znq0cYN3/gDCoBqVmedA4qeG1NrBpvvHodBfRt6AM8Gyn1uQme+NXShf2ovNP0o3lGKyLx0b9vsnbf8bUH/a7wc0CeDTPWh5YNB+aXN/1mSnGmUS/Peu0vIuvcxe8ZXJfXjMFlFcyV0p/SyI5B0BGoIThgODZCqQBZiECoHfJvXv0Cvxsy4kLrdZssNpNVqAYGtQebnU486Y3Nx5aYKbnRFFZUMqx7AJ2nhG+FkNVkI7QAhtxo2ujgU0=

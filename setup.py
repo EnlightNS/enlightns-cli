@@ -40,7 +40,7 @@ setup(
     url='http://enlightns.com/',
     packages=find_packages(),
     include_package_data=True,
-    license='Apache 2.0',
+    license='GPLv3',
     zip_safe=False,
     classifiers=(
         'Development Status :: 4 - Beta',
@@ -48,7 +48,7 @@ setup(
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'Natural Language :: English',
-        'License :: OSI Approved :: Apache Software License',
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Programming Language :: Python',
     ),
     install_requires=get_requirements(),
