@@ -31,9 +31,13 @@ style = click.style
 api = EnlightnsApi()
 device = Device()
 config = EnlightnsConfig()
-gws_ip, inet = ni.gateways()['default'][ni.AF_INET]
-if config and config.interface:
-    inet = config.interface
+try:
+    gws_ip, inet = ni.gateways()['default'][ni.AF_INET]
+    if config and config.interface:
+        inet = config.interface
+except KeyError, e:
+    # No default gateway happens on Linux containers
+    inet = ''
 
 
 @click.group()
