@@ -18,13 +18,35 @@ Install the command line interface
 
     sudo pip install enlightns-cli
     
-    or 
+or 
     
     sudo easy_install enlightns-cli
+   
+    
+## Mac OS (Yosemite)
+
+If you don't have python installed
+
+    brew install python
+    
+Install the command line interface
+
+    sudo pip install enlightns-cli
 
 
-## Centos 6.
+## Centos 6
 
+You need the following libraries
+
+    sudo yum install libffi-devel openssl-devel
+    
+Install the command line interface
+
+    sudo pip install enlightns-cli
+    
+or 
+    
+    sudo easy_install enlightns-cli
 
 
 ## Bash completion
@@ -44,13 +66,14 @@ command line:
     cd enlightns-cli
     pip install --editable .
     
-Execute the unit tests
-
-    
-    
-
 **Important notice you can test your changes without uninstalling and reinstalling.**
+    
+# Execute the unit tests
+
+    make test
 
 # Removing the CLI
+If you wish to uninstall the command line
 
     pip uninstall -y enlightns-cli
+    
