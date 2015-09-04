@@ -2,7 +2,6 @@ language: python
 python:
 - '2.6'
 - '2.7'
-#- '3.3'
 script:
 - make test
 install:
@@ -11,10 +10,10 @@ deploy:
   provider: pypi
   user: d2s3admin
   password:
-    secure: 7PK6ZTCqOOGp4DtQbwJ5YLqTRxQgoe2KToNkqXHLQaCfL0YErWSyeI/asEICxwuj76ZsNI/EFvUsCCi7aatYDQW59Ec9gHnyB0hw/k9NDwKSOJc5TT3KvT61w/39nncb+ft8RJiY1r2AGPpUS4FtwWCIdD/lkqQo6Dq21WuShod7nZhiNbrhbHfYj0oaoQUwaiESfFaoqrJ4t0ax2EqR5ydnBKauhg5EyEPpWKnY8oweFQZe+MZWnYnfnkY4F8bM3MJ9Mq9JRIic/NdxWUW9xnwR6z5s8gSEX9vijjqIqQxkPERTIryd4HZQmiUYPnEgoBROfy6DlM2K0ZAhHedhCZk6DmyUbKEQLac00fU3vyPZ+6P71c1/tNiOrR8IQSFEFc3X2kBtO1MTLJhkNeas8Vzpl38mWKi8VvKekfZ7dNiq2inTMap7npPVwilHeyMQT+5w8IyazbpGSjiyibItN4zchRAJtgy3mQteWIPnt7EOPW8lv3YI7sFFdKsc8SuV6/e8D/T49p23+aiLJvgrSUWtLieS5IJhqC/+QcM4db/d5LgbLl6FmaoLbLbuDm1MGwq/J7AUufFgKzjp18MXWBV3pEpMaO3JwlHJ0Lunz3YPk0HO6CgraqxWy3zr8EdKQ2goANpgiNTP7Rnc4IA0eWDLpsF/lBHKR0gN9FKN6kM=
+    secure: 2QGH0ZCrBk9kKSRlJPji53rMRL8KgFGxk+5uXM9JhOfbcLMJ17ohYJwe8ha2sq5aZAIDb/X+d0wepLvYDio+ko7mPNsAh6MraBm+0s19zZ9VNdf2HrveFcLPEsUf8sYUlOh5UXu83AKaFhNJMTaUnA7xUUFcEfegsXJIGW/49oyb3ZDTkZgKT2WbonaY2Ct4KTxQyWXouLy9ZDYqVeC2imIXRg3ErNcpnrFSptlbtOcmyRoCeF2q23JtUYKDz21hSOqaE7z2mMbWbSNNcPw8ArJoGJMhLRVYRRYCRIRW1oDVtsqLFaG9S5v3M15RmwoZZcHtfHIkaJwm7DETBmDT0sEqqxTS2LRbQEtJ255dYDzY+cg1h/PebuUZrLh8YEU0HgYawVgO2EZ7b/B7EdtrtfFIZdgE3KGMDuV29T1z3ELqjY84xrWrv5oL0Z1D2OuYZjUGxUcHalhrw6d0g68mMwQ9Q157AmR/aG50rzpGIvLqG4rFDjeNBV8EGwshPsGdH2N5uIQ+BfEQqpXC7hMLvAVc6aaTWFahzGCUUwBzemUj2tHfXFuThrWCuj3xYxXs1ODREVNtxAyc1rQZL8rmdaY1gv7ih9QbJEN+LoJ7To3iHvdoa0E8G0yv8LtvV3VlxFLkr5sthjog29PjZHb0fhr7J818KaKq2zpa3b/zvLA=
   on:
     tags: true
-    branch: master
+    repo: EnlightNS/enlightns-cli
 notifications:
   email: false
   slack:
