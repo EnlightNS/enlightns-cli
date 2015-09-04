@@ -4,7 +4,7 @@ EnlightNS.com Command Line Interface
 
 # Installation
 
-- Ubuntu 14.04 or higher
+## Ubuntu 14.04 or higher
 
 If the python package installer is not installed 
     
@@ -23,7 +23,16 @@ Install the command line interface
     sudo easy_install enlightns-cli
 
 
+## Centos 6.
 
+
+
+## Bash completion
+
+To setup the bash completion execute the following command line
+
+    enlightns-cli bash >> ~/.bashrc
+    source ~/.bashrc
 
 
 # Testing or building the app
