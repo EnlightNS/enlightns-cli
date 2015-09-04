@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
+import os
 
 import click
 import netifaces as ni
@@ -58,6 +59,24 @@ def authenticate(username, password):
     else:
         config.write('token', token)
         click.echo('Successfully authenticated')
+
+    return
+
+
+@cli.command()
+def bash():
+    """\b
+    Bash auto-completion functionality.
+    To install the bash completion execute the two following command lines:
+    \b
+    enlightns-cli bash >> ~/.bashrc
+    source ~/.bashrc
+    """
+    file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..',
+                             'bash-complete.sh')
+
+    with open(file_path) as f:
+        click.echo(f.read())
 
     return
 
