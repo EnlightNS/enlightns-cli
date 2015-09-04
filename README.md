@@ -6,25 +6,42 @@ EnlightNS.com Command Line Interface
 
 - Ubuntu 14.04 or higher
 
-    You need the following libraries
+If the python package installer is not installed 
+    
+    sudo apt-get install python-pip
 
-    ```bash
+You need the following libraries
+
     sudo apt-get install libffi-dev libssl-dev
-    ```
+    
+Install the command line interface
+
+    sudo pip install enlightns-cli
+    
+    or 
+    
+    sudo easy_install enlightns-cli
 
 
-# Testing the app clone the repository and activate your virtualenv.
-Once it is activated within the repository folder execute the following command line:
 
-    ```bash
+
+
+# Testing or building the app
+
+Clone the repository and activate a virtualenv or not a virtualenv
+Once it is activated move in the repository folder and execute the following
+command line:
+
     cd enlightns-cli
     pip install --editable .
-    ```
+    
+Execute the unit tests
 
-Important notice you can test your changes without uninstalling and reinstalling.
+    
+    
+
+**Important notice you can test your changes without uninstalling and reinstalling.**
 
 # Removing the CLI
 
-    ```bash
     pip uninstall -y enlightns-cli
-    ```
