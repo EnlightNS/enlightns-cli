@@ -8,7 +8,7 @@ EnlightNS.com Command Line Interface
 
 If the python package installer is not installed 
     
-    sudo apt-get install python-pip
+    sudo apt-get install python-pip python-dev
 
 You need the following libraries
 
@@ -36,6 +36,10 @@ Install the command line interface
 
 ## Centos 6
 
+If python is not installed
+
+    sudo yum install python-devel
+
 You need the following libraries
 
     sudo yum install libffi-devel openssl-devel
@@ -45,7 +49,7 @@ Install the command line interface
     sudo pip install enlightns-cli
     
 or 
-    
+
     sudo easy_install enlightns-cli
 
 

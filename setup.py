@@ -15,7 +15,6 @@ def get_requirements():
 
     :returns: list of requirements
     """
-    requirements = []
     with open('requirements.txt') as f:
         requirements = f.read().splitlines()
 
@@ -34,7 +33,7 @@ setup(
     name='enlightns-cli',
     version=version,
     description='EnlightNS.com Command Line Interface.',
-    long_description='See the long description on http://enlightns.com/about/',
+    long_description='See the long description on https://github.com/EnlightNS/enlightns-cli',
     author='Dominick Rivard',
     author_email='support@enlightns.com',
     url='http://enlightns.com/',
