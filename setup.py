@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
+import os
 
 from setuptools import setup, find_packages
 import re
@@ -55,4 +56,7 @@ setup(
         [console_scripts]
         enlightns-cli=enscli.scripts.cli:cli
     ''',
+    data_files=[('bash-completion', [os.path.join(
+        os.path.dirname(os.path.dirname(__file__)),
+        'bash-complete.sh')]), ]
 )
