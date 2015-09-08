@@ -3,7 +3,7 @@
 This module contains the 
 
 """
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import
 
 # Help Messages
 IF_MSG = """Set the network interface to retrieve the ip
