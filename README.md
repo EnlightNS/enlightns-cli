@@ -38,11 +38,15 @@ Install the command line interface
 
 If python is not installed
 
-    sudo yum install python-devel
+    sudo yum install python-devel python-setuptools
 
 You need the following libraries
 
     sudo yum install libffi-devel openssl-devel
+    
+If python was not installed
+
+    sudo easy_install pip
     
 Install the command line interface
 
