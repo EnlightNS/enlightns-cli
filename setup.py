@@ -56,7 +56,4 @@ setup(
         [console_scripts]
         enlightns-cli=enscli.scripts.cli:cli
     ''',
-    data_files=[('bash-completion', [os.path.join(
-        os.path.dirname(os.path.dirname(__file__)),
-        'bash-complete.sh')]), ]
 )
