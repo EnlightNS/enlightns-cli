@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
 import os
 
 from setuptools import setup, find_packages
@@ -24,12 +23,6 @@ def get_requirements():
 if not version:
     raise RuntimeError('Cannot find version information')
 
-packages = [
-    'enscli',
-    'enscli.scripts',
-    'enscli.rest',
-]
-
 setup(
     name='enlightns-cli',
     version=version,
@@ -52,9 +45,10 @@ setup(
         'Programming Language :: Python',
     ),
     install_requires=get_requirements(),
-    entry_points='''
-        [console_scripts]
-        enlightns-cli=enscli.scripts.cli:cli
-    ''',
-    package_data={'bash-complete.sh': ['bash-complete.sh']},
+    entry_points={
+        'console_scripts': [
+            'enlightns-cli=enscli.scripts.cli:cli',
+        ],
+    },
+    package_data={'enscli': ['bash-complete.sh']},
 )
