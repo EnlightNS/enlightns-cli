@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import
 
 """This is the main file to run the EnlightNS CLI. """
 
@@ -8,7 +8,7 @@ import os
 from enscli.settings import (ENLIGHTNS_BASE_DIR, ENLIGHTNS_CONFIG_DIR,
                              ENLIGHTNS_CONFIG_FULLPATH,)
 
-__version__ = '0.0.1'
+__version__ = '0.0.10'
 
 # Create the setting folder if it does not exists
 if not os.path.exists(ENLIGHTNS_CONFIG_DIR):

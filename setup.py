@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
+import os
 
 from setuptools import setup, find_packages
 import re
@@ -15,7 +16,6 @@ def get_requirements():
 
     :returns: list of requirements
     """
-    requirements = []
     with open('requirements.txt') as f:
         requirements = f.read().splitlines()
 
@@ -34,7 +34,7 @@ setup(
     name='enlightns-cli',
     version=version,
     description='EnlightNS.com Command Line Interface.',
-    long_description='See the long description on http://enlightns.com/about/',
+    long_description='See the long description on https://github.com/EnlightNS/enlightns-cli',
     author='Dominick Rivard',
     author_email='support@enlightns.com',
     url='http://enlightns.com/',
@@ -56,4 +56,7 @@ setup(
         [console_scripts]
         enlightns-cli=enscli.scripts.cli:cli
     ''',
+    data_files=[('bash-completion', [os.path.join(
+        os.path.dirname(os.path.dirname(__file__)),
+        'bash-complete.sh')]), ]
 )

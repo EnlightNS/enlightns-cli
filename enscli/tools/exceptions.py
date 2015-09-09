@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import
 
 from click import ClickException, echo
 from click._compat import get_text_stderr, PY2
