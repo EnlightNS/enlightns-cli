@@ -50,5 +50,7 @@ setup(
             'enlightns-cli=enscli.scripts.cli:cli',
         ],
     },
-    package_data={'enscli': ['bash-complete.sh']},
+    package_data={
+        'enscli': ['bash-complete.sh']
+    },
 )
