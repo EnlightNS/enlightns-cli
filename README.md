@@ -1,6 +1,7 @@
 EnlightNS.com Command Line Interface
 
 [![Build Status](https://travis-ci.org/EnlightNS/enlightns-cli.svg?branch=develop)](https://travis-ci.org/EnlightNS/enlightns-cli)
+[![Latest Version](https://pypip.in/version/enlightns-cli/badge.svg)](https://pypi.python.org/pypi/enlightns-cli/)
 
 # Installation
 
