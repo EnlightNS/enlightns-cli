@@ -51,6 +51,6 @@ setup(
         ],
     },
     package_data={
-        'enscli': ['*bash-complete.sh']
+        'enscli': ['*.sh']
     },
 )
