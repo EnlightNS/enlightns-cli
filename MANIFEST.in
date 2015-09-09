@@ -1,2 +1,6 @@
-include Makefile README.md LICENSE bash-complete.sh requirements.txt
+include Makefile
+include README.md
+include LICENSE
+include bash-complete.sh
+include requirements.txt
 recursive-exclude *.pyc *.pyo

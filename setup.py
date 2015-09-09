@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-import os
-
-from setuptools import setup, find_packages
+from setuptools import find_packages
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 import re
 
 
@@ -43,6 +45,8 @@ setup(
         'Natural Language :: English',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
     ),
     install_requires=get_requirements(),
     entry_points={
@@ -51,6 +55,7 @@ setup(
         ],
     },
     package_data={
-        'enscli': ['*.sh']
+        '': ['LICENSE', ],
+        'enscli': ['*.sh'],
     },
 )
