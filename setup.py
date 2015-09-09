@@ -55,6 +55,6 @@ setup(
     },
     package_data={
         '': ['LICENSE', '*.sh'],
-        'enscli': ['*.sh'],
+        'enscli.scripts': ['bash_complete.sh'],
     },
 )

@@ -1,6 +1,6 @@
 include Makefile
-include README.md
+include README.rst
 include LICENSE
-include bash-complete.sh
+include enscli/scripts/bash_complete.sh
 include requirements.txt
-recursive-exclude *.pyc *.pyo
+exclude *.pyc
