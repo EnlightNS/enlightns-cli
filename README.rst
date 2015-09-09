@@ -1,6 +1,6 @@
 EnlightNS.com Command Line Interface
 
-.. image:: https://secure.travis-ci.org/EnlightNS/enlightns-cli.png
+.. image:: https://travis-ci.org/EnlightNS/enlightns-cli.svg?branch=master
     :target: https://travis-ci.org/EnlightNS/enlightns-cli
 
 .. image:: https://img.shields.io/pypi/v/enlightns-cli.svg
