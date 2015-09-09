@@ -77,7 +77,7 @@ def bash():
     # _ENLIGHTNS_CLI_COMPLETE=source enlightns-cli > bash-complete.sh
     #
     BASE_PATH = os.path.dirname(__file__)
-    file_path = os.path.join(BASE_PATH, '..', '..', 'bash-complete.sh')
+    file_path = os.path.join(BASE_PATH, '..', 'bash-complete.sh')
 
     with open(file_path) as f:
         click.echo(f.read())
