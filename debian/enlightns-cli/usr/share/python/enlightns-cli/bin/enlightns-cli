@@ -1,0 +1,10 @@
+#!/usr/share/python/enlightns-cli/bin/python
+# EASY-INSTALL-ENTRY-SCRIPT: 'enlightns-cli==0.0.21','console_scripts','enlightns-cli'
+__requires__ = 'enlightns-cli==0.0.21'
+import sys
+from pkg_resources import load_entry_point
+
+if __name__ == '__main__':
+    sys.exit(
+        load_entry_point('enlightns-cli==0.0.21', 'console_scripts', 'enlightns-cli')()
+    )
