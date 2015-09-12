@@ -1,3 +1,2 @@
-include Makefile README LICENSE
-recursive-exclude *.pyc
-recursive-exclude *.pyo
+include Makefile README.md LICENSE bash-complete.sh
+recursive-exclude *.pyc *.pyo

@@ -24,10 +24,10 @@ class EnlightnsApi(object):
         url = ENLIGHTNS_API_URL
     auth_header = {'Authorization': 'JWT ' + config.token, }
 
-    def authenticate(self, username, password):
+    def authenticate(self, email, password):
         """Authenticate the user against EnlightNS.com
 
-        :param username: your enlightns.com username
+        :param email: your enlightns.com username
         :param password: your enlightns.com password
 
         :returns: set the token in the configuration file"""
@@ -35,7 +35,7 @@ class EnlightnsApi(object):
         headers = {'Content-type': 'application/json'}
 
         data = {
-            'username': username,
+            'email': email,
             'password': password,
         }
 

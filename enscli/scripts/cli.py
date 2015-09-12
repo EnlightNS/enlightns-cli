@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
+import os
 
 import click
 import netifaces as ni
@@ -47,17 +48,35 @@ def cli():
 
 
 @cli.command()
-@click.option('-u', '--username', prompt=True)
+@click.option('-e', '--email', prompt=True)
 @click.option('-p', '--password', prompt=True, hide_input=True)
-def authenticate(username, password):
+def authenticate(email, password):
     """Authenticate your account on EnlightNS.com"""
-    token = api.authenticate(username=username, password=password)
+    token = api.authenticate(email=email, password=password)
 
     if not token:
         raise EnlightnsException(CANNOT_AUTHENTICATE)
     else:
         config.write('token', token)
         click.echo('Successfully authenticated')
+
+    return
+
+
+@cli.command()
+def bash():
+    """\b
+    Bash auto-completion functionality.
+    To install the bash completion execute the two following command lines:
+    \b
+    enlightns-cli bash >> ~/.bashrc
+    source ~/.bashrc
+    """
+    file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..',
+                             'bash-complete.sh')
+
+    with open(file_path) as f:
+        click.echo(f.read())
 
     return
 
