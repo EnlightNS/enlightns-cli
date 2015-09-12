@@ -6,6 +6,11 @@
 # source ~/.bashrc
 #
 
+#
+# GENERATING THIS FILE
+# _ENLIGHTNS_CLI_COMPLETE=source enlightns-cli > bash-complete.sh
+#
+
 # enlightns-cli bash completion
 _enlightns_cli_completion()
 {

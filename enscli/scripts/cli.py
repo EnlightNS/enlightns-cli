@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import
 import os
 
 import click
@@ -72,8 +72,12 @@ def bash():
     enlightns-cli bash >> ~/.bashrc
     source ~/.bashrc
     """
-    file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..',
-                             'bash-complete.sh')
+    #
+    # GENERATING THIS FILE
+    # _ENLIGHTNS_CLI_COMPLETE=source enlightns-cli > bash-complete.sh
+    #
+    BASE_PATH = os.path.dirname(__file__)
+    file_path = os.path.join(BASE_PATH, 'bash_complete.sh')
 
     with open(file_path) as f:
         click.echo(f.read())
