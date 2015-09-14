@@ -1,0 +1,6 @@
+enlightns-cli (0.0.21) unstable; urgency=low
+
+  * 8b74d25 Added the debian configuration folder
+
+
+ -- Dominick Rivard <support@enlightns.com>  Thu, 10 Sep 2015 01:41:45 +0000

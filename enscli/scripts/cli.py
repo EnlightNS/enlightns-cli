@@ -48,11 +48,11 @@ def cli():
 
 
 @cli.command()
-@click.option('-u', '--username', prompt=True)
+@click.option('-e', '--email', prompt=True)
 @click.option('-p', '--password', prompt=True, hide_input=True)
-def authenticate(username, password):
+def authenticate(email, password):
     """Authenticate your account on EnlightNS.com"""
-    token = api.authenticate(username=username, password=password)
+    token = api.authenticate(email=email, password=password)
 
     if not token:
         raise EnlightnsException(CANNOT_AUTHENTICATE)
@@ -77,7 +77,7 @@ def bash():
     # _ENLIGHTNS_CLI_COMPLETE=source enlightns-cli > bash-complete.sh
     #
     BASE_PATH = os.path.dirname(__file__)
-    file_path = os.path.join(BASE_PATH, '..', 'bash-complete.sh')
+    file_path = os.path.join(BASE_PATH, 'bash_complete.sh')
 
     with open(file_path) as f:
         click.echo(f.read())
