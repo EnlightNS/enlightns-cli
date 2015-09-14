@@ -32,7 +32,7 @@ setup(
     long_description='See the long description on https://github.com/EnlightNS/enlightns-cli',
     author='Dominick Rivard',
     author_email='support@enlightns.com',
-    maintainer = "Dominick Rivard",
+    maintainer="Dominick Rivard",
     maintainer_email = "support@enlightns.com",
     url='http://enlightns.com/',
     packages=find_packages(),
