@@ -1,0 +1,6 @@
+enlightns-cli (0.0.21) unstable; urgency=low
+
+  * e6e452c removed debian directory to recreate it
+
+
+ -- Dominick Rivard <support@enlightns.com>  Tue, 15 Sep 2015 23:56:01 +0000
