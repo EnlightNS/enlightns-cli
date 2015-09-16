@@ -1,6 +1,6 @@
 enlightns-cli (0.0.21) unstable; urgency=low
 
-  * 8b74d25 Added the debian configuration folder
+  * e6e452c removed debian directory to recreate it
 
 
- -- Dominick Rivard <support@enlightns.com>  Thu, 10 Sep 2015 01:41:45 +0000
+ -- Dominick Rivard <support@enlightns.com>  Tue, 15 Sep 2015 23:56:01 +0000

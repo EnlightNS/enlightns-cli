@@ -39,7 +39,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/home/dominick/projects/enlightns-cli/debian/enlightns-cli/usr/share/python/enlightns-cli"
+VIRTUAL_ENV="/usr/share/python/enlightns-cli"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
