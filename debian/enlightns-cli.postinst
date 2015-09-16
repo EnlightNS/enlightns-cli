@@ -1,0 +1,1 @@
+ln -s /usr/share/python/enlightns-cli/bin/enlightns-cli /usr/bin/
