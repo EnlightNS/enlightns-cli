@@ -9,6 +9,10 @@ EnlightNS.com Command Line Interface
 .. image:: https://img.shields.io/pypi/dm/enlightns-cli.svg
         :target: https://pypi.python.org/pypi/enlightns-cli
 
+
+.. contents:: Table of Contents
+
+
 Installation
 ============
 
@@ -121,6 +125,31 @@ or
 
     sudo easy_install enlightns-cli
 
+
+Packages
+--------
+
+We also provide compiled packages hosted on
+
+.. image:: https://www.bintray.com/docs/images/bintray_badge_color.png
+        :target: https://bintray.com/enlightns/debian/enlightns-cli/view?source=watch
+
+Ubuntu or Debian
+^^^^^^^^^^^^^^^^
+
+::
+
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61
+    echo "deb https://dl.bintray.com/enlightns/debian /" | sudo tee -a /etc/apt/sources.list
+
+CentOS or Fedora
+^^^^^^^^^^^^^^^^
+
+::
+
+    # Centos or Fedora
+    .. coming soon ..
+
 Bash completion
 ---------------
 
@@ -131,8 +160,11 @@ To setup the bash completion execute the following command line
     enlightns-cli bash >> ~/.bashrc
     source ~/.bashrc
 
+Development
+===========
+
 Testing or building the app
-===========================
+---------------------------
 
 Clone the repository and activate a virtualenv or not a virtualenv Once
 it is activated move in the repository folder and execute the following
@@ -147,17 +179,18 @@ command line:
 reinstalling.**
 
 Execute the unit tests
-======================
+----------------------
 
 ::
 
     make test
 
 Removing the CLI
-================
+----------------
 
 If you wish to uninstall the command line
 
 ::
 
     pip uninstall -y enlightns-cli
+
