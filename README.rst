@@ -140,7 +140,7 @@ Ubuntu or Debian
 ::
 
     sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61
-    echo "deb https://dl.bintray.com/enlightns/debian /" | sudo tee -a /etc/apt/sources.list
+    echo "deb http://dl.bintray.com/enlightns/debian /" | sudo tee -a /etc/apt/sources.list
 
 CentOS or Fedora
 ^^^^^^^^^^^^^^^^
