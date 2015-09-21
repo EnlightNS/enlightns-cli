@@ -43,13 +43,9 @@ def create_a_cron(ttl, action, comment):
 
     if minutes:
         job.minute.every(minutes)
-    else:
-        job.minute.on(0)
 
     if hours and not minutes:
         job.hour.every(hours)
-    else:
-        job.hour.on(0)
 
     if days and not hours and not minutes:
         job.every(days).days()
