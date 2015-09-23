@@ -21,7 +21,7 @@ from enscli.tools.messages import (IF_MSG, SET_REC_MSG, REC_LIST_MSG, REC_FAIL,
                                    CRON_TWO_WRITTEN_MSG, CRON_STD_WRITTEN_MSG,
                                    CRON_EXISTS, REC_NOT_AVAIL, CFG_RECORDS_MSG,
                                    CFG_TWO_WAY_RECORDS, CFG_API_AVAIL_RECORDS,
-                                   AUTHENTICATE_MSG, CANNOT_AUTHENTICATE)
+                                   AUTHENTICATE_MSG, CANNOT_AUTHENTICATE, SHOW_CONFIG_HELP)
 from enscli.tools.resolver import resolve_a_record
 
 
@@ -84,101 +84,6 @@ def bash():
 
     return
 
-
-@cli.command()
-@click.option('-r', '--records', help=SET_REC_MSG)
-@click.option('-6', '--ipv6', type=click.Choice(['on', 'off']),
-              help=SET_IPV6_HELP)
-@click.option('-w', '--which-ip', type=click.Choice(['lan', 'wan']),
-              help=SET_WHICH_IP_HELP)
-@click.option('-i', '--interface', type=click.Choice(device.interfaces_only()),
-              help=SET_INET_HELP)
-@click.option('-d', '--debug', type=click.Choice(['on', 'off']),
-              help=SET_DEBUG_HELP)
-@click.option('-l', '--lan-record', help=SET_REC_LAN_MSG)
-@click.option('-p', '--wan-record', help=SET_REC_WAN_MSG)
-def configure(records, ipv6, which_ip, interface, debug, lan_record,
-              wan_record):
-    """Configure the EnlightNS agent."""
-    if not config.token:
-        raise EnlightnsException(AUTHENTICATE_MSG)
-
-    if not (records or ipv6 or which_ip or interface or debug or lan_record or
-            wan_record):
-        raise EnlightnsException("enlightns-cli configure --help")
-
-    # validates ownership of the record(s)
-    if records:
-        valid_list = []
-        records_list = []
-        click.echo('Validating the records ...')
-        with click.progressbar(records.split(',')) as prompt_records:
-            for record in prompt_records:
-                is_owner, record = api.check_records(record=record)
-                valid_list.append(is_owner)
-                records_list.append(record)
-
-        if False in valid_list:
-            raise EnlightnsException(REC_FAIL)
-        else:
-            # Write the records to the configuration file
-            rec = ""
-            for record in records_list:
-                rec += '{' + str(record['id']) + '}' + record['name'] + ','
-            config.write('records', rec)
-            click.echo(REC_WRITE_SUCCESS.format(records))
-
-    # set if IPv6 is supported
-    if ipv6:
-        config.write('ipv6', ipv6)
-    elif not ipv6 and not config.ipv6:
-        config.write('ipv6', 'off')
-
-    # set if we update the record with the public or local ip address
-    if which_ip in ['wan', 'lan']:
-        config.write('which_ip', which_ip)
-    elif not which_ip and not config.which_ip:
-        config.write('which_ip', 'lan')
-
-    # set the interface we get the ip address from
-    if interface:
-        config.write('interface', interface)
-    elif not interface and not config.interface:
-        config.write('interface', inet)
-
-    # set the debug on
-    if debug:
-        config.write('debug', debug)
-    elif not debug and not config.debug:
-        config.write('debug', 'off')
-
-    # sets the lan record for two way mode
-    if lan_record and not len(lan_record.split(',')) == 1:
-        raise EnlightnsException(TWO_ONLY_ONE_REC_MSG)
-
-    if lan_record and len(lan_record.split(',')) == 1:
-        is_owner, record = api.check_records(record=lan_record)
-        if not (is_owner and record):
-            raise EnlightnsException(REC_OWNER_OR_EXISTS_MSG)
-        else:
-            record = '{' + str(record['id']) + '}' + record['name'] + ','
-            config.write('record_lan', record)
-            click.echo(REC_WRITE_SUCCESS.format('LAN'))
-
-    # sets the wan record for two way mode
-    if wan_record and not len(wan_record.split(',')) == 1:
-        raise EnlightnsException(TWO_ONLY_ONE_REC_MSG)
-
-    if wan_record and len(wan_record.split(',')) == 1:
-        is_owner, record = api.check_records(record=wan_record)
-        if not (is_owner and record):
-            raise EnlightnsException(REC_OWNER_OR_EXISTS_MSG)
-        else:
-            record = '{' + str(record['id']) + '}' + record['name'] + ','
-            config.write('record_wan', record)
-            click.echo(REC_WRITE_SUCCESS.format('WAN'))
-
-    return
 
 
 @cli.command()
@@ -347,6 +252,113 @@ def logout():
     """Logout your account from the agent."""
     config.logout()
     click.echo('You successfully logged out.')
+
+    return
+
+
+@cli.command()
+@click.option('-s', '--show', default=False, flag_value=True, help=SHOW_CONFIG_HELP)
+@click.option('-r', '--records', help=SET_REC_MSG)
+@click.option('-6', '--ipv6', type=click.Choice(['on', 'off']),
+              help=SET_IPV6_HELP)
+@click.option('-w', '--which-ip', type=click.Choice(['lan', 'wan']),
+              help=SET_WHICH_IP_HELP)
+@click.option('-i', '--interface', type=click.Choice(device.interfaces_only()),
+              help=SET_INET_HELP)
+@click.option('-d', '--debug', type=click.Choice(['on', 'off']),
+              help=SET_DEBUG_HELP)
+@click.option('-l', '--lan-record', help=SET_REC_LAN_MSG)
+@click.option('-p', '--wan-record', help=SET_REC_WAN_MSG)
+def setup(show, records, ipv6, which_ip, interface, debug, lan_record,
+          wan_record):
+    """Setup the EnlightNS agent."""
+    if show:
+        for key, value in config.read().items():
+            if not key == "token":
+                if key in ['record_lan', 'record_wan']:
+                    value = config.record_to_str(value)
+                if key in ['records']:
+                    value = ', '.join(config.records_to_str())
+                click.echo("{}: {}".format(key, value))
+        return
+
+    if not config.token:
+        raise EnlightnsException(AUTHENTICATE_MSG)
+
+    if not (records or ipv6 or which_ip or interface or debug or lan_record or
+            wan_record):
+        raise EnlightnsException("enlightns-cli setup --help")
+
+    # validates ownership of the record(s)
+    if records:
+        valid_list = []
+        records_list = []
+        click.echo('Validating the records ...')
+        with click.progressbar(records.split(',')) as prompt_records:
+            for record in prompt_records:
+                is_owner, record = api.check_records(record=record)
+                valid_list.append(is_owner)
+                records_list.append(record)
+
+        if False in valid_list:
+            raise EnlightnsException(REC_FAIL)
+        else:
+            # Write the records to the configuration file
+            rec = ""
+            for record in records_list:
+                rec += '{' + str(record['id']) + '}' + record['name'] + ','
+            config.write('records', rec)
+            click.echo(REC_WRITE_SUCCESS.format(records))
+
+    # set if IPv6 is supported
+    if ipv6:
+        config.write('ipv6', ipv6)
+    elif not ipv6 and not config.ipv6:
+        config.write('ipv6', 'off')
+
+    # set if we update the record with the public or local ip address
+    if which_ip in ['wan', 'lan']:
+        config.write('which_ip', which_ip)
+    elif not which_ip and not config.which_ip:
+        config.write('which_ip', 'lan')
+
+    # set the interface we get the ip address from
+    if interface:
+        config.write('interface', interface)
+    elif not interface and not config.interface:
+        config.write('interface', inet)
+
+    # set the debug on
+    if debug:
+        config.write('debug', debug)
+    elif not debug and not config.debug:
+        config.write('debug', 'off')
+
+    # sets the lan record for two way mode
+    if lan_record and not len(lan_record.split(',')) == 1:
+        raise EnlightnsException(TWO_ONLY_ONE_REC_MSG)
+
+    if lan_record and len(lan_record.split(',')) == 1:
+        is_owner, record = api.check_records(record=lan_record)
+        if not (is_owner and record):
+            raise EnlightnsException(REC_OWNER_OR_EXISTS_MSG)
+        else:
+            record = '{' + str(record['id']) + '}' + record['name'] + ','
+            config.write('record_lan', record)
+            click.echo(REC_WRITE_SUCCESS.format('LAN'))
+
+    # sets the wan record for two way mode
+    if wan_record and not len(wan_record.split(',')) == 1:
+        raise EnlightnsException(TWO_ONLY_ONE_REC_MSG)
+
+    if wan_record and len(wan_record.split(',')) == 1:
+        is_owner, record = api.check_records(record=wan_record)
+        if not (is_owner and record):
+            raise EnlightnsException(REC_OWNER_OR_EXISTS_MSG)
+        else:
+            record = '{' + str(record['id']) + '}' + record['name'] + ','
+            config.write('record_wan', record)
+            click.echo(REC_WRITE_SUCCESS.format('WAN'))
 
     return
 

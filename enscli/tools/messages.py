@@ -58,3 +58,4 @@ AUTHENTICATE_MSG = """You MUST be authenticated. --> enlightns-cli authenticate"
 CANNOT_AUTHENTICATE = """Unable to authenticate your account, please try again."""
 ERROR_WHILE_DELETING_CONFIG = """An error occured while deleting the configuration file."""
 
+SHOW_CONFIG_HELP = """Show your local configuration file"""

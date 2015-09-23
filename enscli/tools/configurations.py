@@ -144,8 +144,7 @@ class EnlightnsConfig(object):
         records.remove('')
         text_records = []
         for record in records:
-            pk, record = record.split('}')
-            text_records.append(record)
+            text_records.append(self.record_to_str(record))
 
         return text_records
 
@@ -153,7 +152,10 @@ class EnlightnsConfig(object):
     def record_to_str(record):
         """Returns the configured records into a list of string"""
         record = record.split(',')
-        record.remove('')
+        try:
+            record.remove('')
+        except ValueError:
+            pass
         pk, record = record[0].split('}')
 
         return record
