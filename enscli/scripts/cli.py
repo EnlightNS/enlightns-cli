@@ -252,7 +252,6 @@ def logout():
     """Logout your account from the agent."""
     config.logout()
     click.echo('You successfully logged out.')
-
     return
 
 

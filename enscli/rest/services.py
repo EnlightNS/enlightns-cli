@@ -22,7 +22,7 @@ class EnlightnsApi(object):
         url = ENLIGHTNS_API_DEBUG_URL
     else:
         url = ENLIGHTNS_API_URL
-    auth_header = {'Authorization': 'JWT ' + config.token, }
+    auth_header = {'Authorization': config.token, }
 
     def authenticate(self, email, password):
         """Authenticate the user against EnlightNS.com

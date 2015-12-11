@@ -2,14 +2,13 @@
 from __future__ import absolute_import
 
 from ConfigParser import ConfigParser
-import os
 import shutil
 
 import click
 
 from enscli.settings import (ENLIGHTNS_CONFIG_FULLPATH,
-                             ENLIGHTNS_CONFIG_SECTION, )
-from enscli.tools.messages import ERROR_WHILE_DELETING_CONFIG
+                             ENLIGHTNS_CONFIG_SECTION, 
+                             ENLIGHTNS_CONFIG_DIR, )
 
 
 class EnlightnsConfig(object):
@@ -129,15 +128,6 @@ class EnlightnsConfig(object):
 
         return option, value
 
-    @staticmethod
-    def delete():
-        """Deletes the configuration file"""
-        try:
-            os.remove(ENLIGHTNS_CONFIG_FULLPATH)
-        except Exception, e:
-            msg = 'Unable to delete the configuration file, error: {0}'
-            click.echo(click.style(msg.format(e), fg='red'))
-
     def records_to_str(self):
         """Returns the configured records into a list of string"""
         records = self.records.split(',')
@@ -193,19 +183,11 @@ class EnlightnsConfig(object):
 
     @staticmethod
     def logout():
-        """Returns the LAN or WAN record from the configuration file.
-
-        :param record: the record to extract the pk and record
-
-        :returns: the pk and the record
-        """
-
+        """Deletes the configuration file"""
         try:
-            shutil.rmtree(ENLIGHTNS_CONFIG_FULLPATH, ignore_errors=True)
-            failed = False
+            shutil.rmtree(ENLIGHTNS_CONFIG_DIR, ignore_errors=True)
         except Exception, e:
-            click.echo(ERROR_WHILE_DELETING_CONFIG)
-            failed = True
+            msg = 'Unable to delete the configuration file, error: {0}'
+            click.echo(click.style(msg.format(e), fg='red'))
 
-        return failed
 
