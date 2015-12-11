@@ -8,7 +8,7 @@ import os
 from enscli.settings import (ENLIGHTNS_BASE_DIR, ENLIGHTNS_CONFIG_DIR,
                              ENLIGHTNS_CONFIG_FULLPATH,)
 
-__version__ = '0.0.21'
+__version__ = '0.0.25'
 
 # Create the setting folder if it does not exists
 if not os.path.exists(ENLIGHTNS_CONFIG_DIR):
