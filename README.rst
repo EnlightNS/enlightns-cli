@@ -193,4 +193,27 @@ If you wish to uninstall the command line
 ::
 
     pip uninstall -y enlightns-cli
+    
+Usage
+=====
+
+How to use the command line tool to configure your hostname to be updated periodically.
+
+::
+
+    # Login
+    enlightns-cli authenticate
+    
+    # Bash completion if you want it
+    enlightns-cli bash >> ~/.bashrc
+
+    # configure your record that you previously created on the dashboard at https://enlightns.com/
+    enlightns-cli setup --help
+    enlightns-cli setup -r home-lakhdar.enlightns.info -w wan
+    
+    # update the client with your ip
+    enlightns-cli update -f
+    
+    # install the scheduled job for your system to update
+    enlightns-cli cron -a
 
