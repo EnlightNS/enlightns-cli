@@ -25,7 +25,7 @@ SET_INET_HELP = """Set which interface to use for the updates
 
 Usage:
 
-    enlightns-cli configure -i eth0"""
+    enlightns-cli setup -i eth0"""
 SET_DEBUG_HELP = """Turn on|off debug"""
 NOTHING_HAPPENED_MSG = """It looks like you didn't configure a record to be updated."""
 NO_UPDATE = """No update needed."""

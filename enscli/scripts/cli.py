@@ -381,9 +381,6 @@ def two(force, silent):
             wan_ip = wan_ip['ip']
         result = []
 
-        if not silent:
-            click.echo(UPDATE_MSG)
-
         # identify the LAN IP address by resolving the record
         pk, record = config.get_record_and_pk(config.record_lan)
         record_ip = resolve_a_record(record)
@@ -392,7 +389,7 @@ def two(force, silent):
             result = api.update(pk, lan_ip)
 
         if result and not silent:
-            click.echo(result['name'] + '\t' + result['content'])
+            click.echo("{:<50s}{:>15s}".format(result['name'], result['content']))
 
         if not result and not silent:
             click.echo('No update needed for the LAN Record')
@@ -405,7 +402,7 @@ def two(force, silent):
             result = api.update(pk, wan_ip)
 
         if result and not silent:
-            click.echo(result['name'] + '\t' + result['content'])
+            click.echo("{:<50s}{:>15s}".format(result['name'], result['content']))
 
         if not result and not silent:
             click.echo('No update needed for the WAN Record')
@@ -447,17 +444,13 @@ def update(force, silent):
 
     # update the record
     if ip not in record_ip or len(record_ip) > 1 or force:
-        results = []
         if not silent:
-            click.echo(UPDATE_MSG)
-            with click.progressbar(config.records_with_pk()) as bar_records:
-                for pk, record in bar_records:
-                    result = api.update(pk, ip)
-                    if result:
-                        results.append(result)
-
-            for r in results:
-                click.echo(r['name'] + '\t' + r['content'])
+            #click.echo(UPDATE_MSG)
+            #with click.progressbar(config.records_with_pk()) as bar_records:
+            for pk, record in config.records_with_pk():
+                result = api.update(pk, ip)
+                if result:
+                    click.echo("{:<50s}{:>15s}".format(result['name'], result['content']))
         else:
             for pk, record in config.records_with_pk():
                 api.update(pk, ip)
