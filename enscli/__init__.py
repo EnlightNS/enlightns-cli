@@ -12,12 +12,12 @@ __version__ = '0.0.28'
 
 # Create the setting folder if it does not exists
 if not os.path.exists(ENLIGHTNS_CONFIG_DIR):
-    os.makedirs(ENLIGHTNS_CONFIG_DIR, mode="0700")
+    os.makedirs(ENLIGHTNS_CONFIG_DIR, mode=0700)
 
 # Create the configuration file if it does not exists
 if not os.path.isfile(ENLIGHTNS_CONFIG_FULLPATH):
     file = os.fdopen(
-        os.open(ENLIGHTNS_CONFIG_FULLPATH, os.O_WRONLY | os.O_CREAT, "0700"),
+        os.open(ENLIGHTNS_CONFIG_FULLPATH, os.O_WRONLY | os.O_CREAT, 0700),
         'w'
     )
     file.close()
