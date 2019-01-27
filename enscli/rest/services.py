@@ -108,7 +108,7 @@ class EnlightnsApi(object):
         try:
             record = result[0]
             is_owner = True if result and 'name' in result[0] else False
-        except Exception, e:
+        except Exception:
             record = None
             is_owner = False
 

@@ -59,7 +59,7 @@ class Device(object):
             # in my case it was %en5 had to clean this out
             lan_ip = lan_ip.split('%')[0]
             IP(lan_ip)
-        except Exception, e:
+        except Exception as e:
             lan_ip = False
 
         if not lan_ip:
@@ -72,7 +72,7 @@ class Device(object):
                 else:
                     lan_ip = ni.ifaddresses(inet)[ni.AF_INET6][0]['addr']
                     IP(lan_ip)
-            except Exception, e:
+            except Exception as e:
                 lan_ip = False
 
         return lan_ip

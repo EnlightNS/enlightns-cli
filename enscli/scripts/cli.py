@@ -36,7 +36,7 @@ try:
     gws_ip, inet = ni.gateways()['default'][ni.AF_INET]
     if config and config.interface:
         inet = config.interface
-except KeyError, e:
+except KeyError as e:
     # No default gateway happens on Linux containers
     inet = ''
 

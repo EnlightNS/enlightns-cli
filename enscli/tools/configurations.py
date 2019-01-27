@@ -186,7 +186,7 @@ class EnlightnsConfig(object):
         """Deletes the configuration file"""
         try:
             shutil.rmtree(ENLIGHTNS_CONFIG_DIR, ignore_errors=True)
-        except Exception, e:
+        except Exception as e:
             msg = 'Unable to delete the configuration file, error: {0}'
             click.echo(click.style(msg.format(e), fg='red'))
 
