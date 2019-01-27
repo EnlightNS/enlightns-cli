@@ -10,7 +10,6 @@ deploy:
   user: d2s3admin
   on:
     tags: true
-    distributions: sdist bdist_wheel
     repo: EnlightNS/enlightns-cli
   password:
     secure: 1vWAlTZipyJdxT7KwikhdkPpQd6WQFixSwlxPZjLdzdAi07Tk2UFb4gMSmjn0oxneZXu5j2KGYkCv5QLq/+P6PoPZboQ09XHmGEuopL2oOwYdRDIOPZsDUhVuSTWqK2krkXWqgM/odeDO2Tf2jjqYyawO3tiEzwLK/otVlVkavrwUhvW0EeBC/wtAKneqetDz0qJQFPrpR8dAiQ0FJeFlpiWyAyauOi1kvoaR0KralCOnxLshby6RSRkmR/ll5i4qCCCpot/2uzsRyrQtcKOMpNSCsTBuWMj9X9ZoewPRisMAD0YTdEBgfkFDl5MDy4pRlaIiBZWLeOMDhLeGfstSUWva57DFFpoZc1cxa6ylSsj2INEnnRJ9OirEv1KjiYH/D97bT8r2GoMAlEfv1DSClBfIIWpqNPnuyJIIlrFQsfwBRTM1qVmsfBhUHj+NVHOY6IbN/Z7wt1+VvaOC8FxgcbGH+BO3RiyxX7rAkAR/mxVJbAYu6Egkr+e2UZEriiTJJGZaTkK2fGEO5uv+DeXoVq/CYuNq+LRfV+LghNP9Ly8aO8HXQ3sMvFuwryce1kQyLnStMDJ0RpdIVdUnp262nJ0Urw4noeLeLQzUrOAFPWxGCoK0DyvvJEHLVpVPuYbxyVdRSZcCg/uZCQ/j8fkAJ1Z6HKqO3G3CfOr0IMgyH4=
