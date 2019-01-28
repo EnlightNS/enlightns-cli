@@ -15,7 +15,7 @@ SET_REC_MSG = """Set the record(s) to update
     """
 SET_REC_LAN_MSG = """Set the LAN record (Two way mode)."""
 SET_REC_WAN_MSG = """Set the WAN record (Two way mode)."""
-REC_LIST_MSG = "\t{0}\tTTL: {1} IP: {2} TYPE: {3}"
+REC_LIST_MSG = "{:<50s} TTL: {:>5s} IP: {:>15s} TYPE: {:>6s}"
 REC_FAIL = """You are not the owner of the record or it does not exists"""
 REC_NOT_AVAIL = """You MUST sets a record first."""
 REC_WRITE_SUCCESS = """Successfully wrote the {0} record to your configuration file."""
@@ -29,6 +29,10 @@ Usage:
 SET_DEBUG_HELP = """Turn on|off debug"""
 NOTHING_HAPPENED_MSG = """It looks like you didn't configure a record to be updated."""
 NO_UPDATE = """No update needed."""
+HOST_HELP_MSG = """Show your DNS record(s).
+
+By default it lists the records configured for the dynamic update.
+"""
 TWO_ONLY_ONE_REC_MSG = """You can only use one DNS record using the Two way mode."""
 TWO_HELP_MSG = """Two way update mode.
 

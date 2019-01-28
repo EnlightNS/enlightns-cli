@@ -10,23 +10,25 @@ from enscli.tools.configurations import EnlightnsConfig
 from enscli.tools.cron import create_a_cron
 from enscli.tools.exceptions import EnlightnsException
 from enscli.tools.interfaces import Device
-from enscli.tools.messages import (IF_MSG, SET_REC_MSG, REC_LIST_MSG, REC_FAIL,
-                                   REC_WRITE_SUCCESS, SET_IPV6_HELP,
-                                   SET_WHICH_IP_HELP, SET_INET_HELP,
-                                   SET_DEBUG_HELP, NOTHING_HAPPENED_MSG,
-                                   NO_UPDATE, TWO_HELP_MSG, SET_REC_LAN_MSG,
-                                   SET_REC_WAN_MSG, REC_OWNER_OR_EXISTS_MSG,
-                                   TWO_ONLY_ONE_REC_MSG, TWO_WAY_CFG_MSG,
-                                   UPDATE_MSG, CRON_TWO_MSG, CRON_STD_MSG,
-                                   CRON_TWO_WRITTEN_MSG, CRON_STD_WRITTEN_MSG,
-                                   CRON_EXISTS, REC_NOT_AVAIL, CFG_RECORDS_MSG,
-                                   CFG_TWO_WAY_RECORDS, CFG_API_AVAIL_RECORDS,
-                                   AUTHENTICATE_MSG, CANNOT_AUTHENTICATE, SHOW_CONFIG_HELP)
+from enscli.tools.messages import (
+    IF_MSG, SET_REC_MSG, REC_LIST_MSG, REC_FAIL,
+    REC_WRITE_SUCCESS, SET_IPV6_HELP,
+    SET_WHICH_IP_HELP, SET_INET_HELP,
+    SET_DEBUG_HELP, NOTHING_HAPPENED_MSG,
+    NO_UPDATE, TWO_HELP_MSG, SET_REC_LAN_MSG,
+    SET_REC_WAN_MSG, REC_OWNER_OR_EXISTS_MSG,
+    TWO_ONLY_ONE_REC_MSG, TWO_WAY_CFG_MSG,
+    UPDATE_MSG, CRON_TWO_MSG, CRON_STD_MSG,
+    CRON_TWO_WRITTEN_MSG, CRON_STD_WRITTEN_MSG,
+    CRON_EXISTS, REC_NOT_AVAIL, CFG_RECORDS_MSG,
+    CFG_TWO_WAY_RECORDS, CFG_API_AVAIL_RECORDS,
+    AUTHENTICATE_MSG, CANNOT_AUTHENTICATE, SHOW_CONFIG_HELP,
+    HOST_HELP_MSG)
 from enscli.tools.resolver import resolve_a_record
-
 
 # Click utilities
 style = click.style
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 # CLI settings
 api = EnlightnsApi()
@@ -41,7 +43,7 @@ except KeyError as e:
     inet = ''
 
 
-@click.group()
+@click.group(context_settings=CONTEXT_SETTINGS)
 @click.version_option(message='%(version)s')
 def cli():
     """Helps managing your EnlightNS Dynamic DNS"""
@@ -152,53 +154,44 @@ def cron(two_way, agent, show):
     return
 
 
-@cli.command()
+@cli.command(help=HOST_HELP_MSG)
 @click.option('-l', '--list-records', default=False, flag_value=True,
               help='List all records available in EnlightNS.com')
-@click.option('-a', '--all', default=False, flag_value=True,
+@click.option('-a', '--all', 'all_', default=False, flag_value=True,
               help='List all records including the locally set')
-@click.option('-t', '--text', default=False, flag_value=True,
-              help='Returns the DNS record in a text format. (use alone)')
-def hosts(list_records, all, text):
+@click.option('-t', '--two', default=False, flag_value=True,
+              help='List the two way record(s) currently configured.')
+def hosts(list_records, all_, two):
     """Manage your DNS record(s)"""
     if not config.token:
         raise EnlightnsException(AUTHENTICATE_MSG)
 
     # Default: show the record that is set in the config file
-    if config.records and (not list_records and not text or all):
-        click.echo(style(CFG_RECORDS_MSG, fg='cyan'))
-        for record in config.records_to_str():
-            click.echo('\t' + record)
-        click.echo('')
-
-    # show lan and wan record if they are set
-    if not text and not list_records and all and (config.record_lan
-                                                  and config.record_wan):
-        click.echo(style(CFG_TWO_WAY_RECORDS, fg='green'))
-
-        if config.record_lan:
-            click.echo('\t' + config.record_to_str(config.record_lan))
-
-        if config.record_wan:
-            click.echo('\t' + config.record_to_str(config.record_wan))
-        click.echo('')
-
-    # list the records from the API
-    if list_records or all:
-        result = api.list_records()
-        if result:
-            click.echo(style(CFG_API_AVAIL_RECORDS, fg='yellow'))
-            for record in result:
-                click.echo(
-                    REC_LIST_MSG.format(record['name'],
-                                        str(record['ttl']).ljust(6, str(' ')),
-                                        record['content'].ljust(15, str(' ')),
-                                        record['type']))
-            click.echo('')
-
-    if text and not all and not list_records:
+    if config.records and (not list_records and not two or all_):
+        click.echo(style(CFG_RECORDS_MSG, fg='cyan')) if all_ else None
         for record in config.records_to_str():
             click.echo(record)
+        click.echo('') if all_ else None
+
+    # -t: shows the two way records
+    if two or (not list_records and all_ and (config.record_lan and config.record_wan)):
+        click.echo(style(CFG_TWO_WAY_RECORDS, fg='green')) if all_ else None
+        click.echo('{:<50s} (LAN)'.format(config.record_to_str(config.record_lan))) if config.record_lan else None
+        click.echo('{:<50s} (WAN)'.format(config.record_to_str(config.record_wan))) if config.record_wan else None
+        click.echo('')  if all_ else None
+
+    # -l: list the records from the API
+    if list_records or all_:
+        result = api.list_records()
+        if result:
+            click.echo(style(CFG_API_AVAIL_RECORDS, fg='yellow')) if all_ else None
+            for record in result:
+                click.echo(
+                    REC_LIST_MSG.format(
+                        record['name'],
+                        str(record['ttl']),
+                        record['content'],
+                        record['type']))
 
     if not config.records and not list_records:
         click.echo('Please set a record to update')
@@ -465,10 +458,7 @@ def update(force, silent):
 @click.option('-j', '--json', default=False, flag_value=True,
               help='Returns the IP in a JSON format.')
 def wan(json):
-    """Returns your public IP"""
-    if not config.token:
-        raise EnlightnsException(AUTHENTICATE_MSG)
-
+    """Returns your public IP as text"""
     my_ip = api.ip()
 
     if not(json and 'ip' in my_ip):

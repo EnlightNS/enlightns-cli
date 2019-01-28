@@ -13,8 +13,10 @@ class EnlightnsApi(object):
     """The class that will encapsulate all the calls we can do to the EnlightNS
     API."""
     config = EnlightnsConfig()
+    auth_header = {}
     if config.token:
         token = config.token
+        auth_header['Authorization'] = config.token
     else:
         token = ''
     device = Device()
@@ -22,7 +24,6 @@ class EnlightnsApi(object):
         url = ENLIGHTNS_API_DEBUG_URL
     else:
         url = ENLIGHTNS_API_URL
-    auth_header = {'Authorization': config.token, }
 
     def authenticate(self, email, password):
         """Authenticate the user against EnlightNS.com
