@@ -7,7 +7,7 @@ install:
 - pip install .
 deploy:
   provider: pypi
-  user: d2s3admin
+  user: "__token__"
   on:
     tags: true
     repo: EnlightNS/enlightns-cli
