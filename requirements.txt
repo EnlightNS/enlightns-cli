@@ -24,6 +24,6 @@ pyOpenSSL==19.0.0
 pytest==4.1.1
 python-crontab==2.3.6
 python-dateutil==2.7.5
-requests==2.21.0
+requests==2.31.0
 six==1.12.0
 urllib3==1.26.5
